@@ -1,12 +1,17 @@
 # _min_ - A small programming language
+tl;dr: go straight to [_min_ in five minutes](#min-in-five-minutes)
+
 ## Key objectives
 The primary goal of this project is to create a simple programming language, mainly for educational purposes and to explore the aspects of building a compiler, with a strong focus on developing a robust tokenizer and parser error reporting system.
 
-> [!CAUTION]
-> This project was made as a learning project, so sorry in advance for the possibly messy codebase.
+## Targets
+The programming languages targets the .NET platform. 
 
 ## Language specification
 The _min_ syntax is intentionally small. For a detailed specification, please refer to [SPECS.md](SPECS.md).
+
+> [!CAUTION]
+> This project was made as a learning project, so sorry in advance for the possibly messy codebase.
 
 ## _min_ in five minutes
 ```
