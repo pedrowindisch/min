@@ -1,4 +1,5 @@
 using System.Collections;
+using Min.Compiler.Exceptions;
 
 namespace Min.Compiler;
 
@@ -52,7 +53,7 @@ public class Tokenizer : IEnumerable<Token>
                 char when char.IsNumber(currentChar) => MatchNumber(),
                 '"' => MatchString(),
 
-                _ => throw new Exception()
+                _ => throw new CompilerException(_currentLine, _currentColumn, CompilerExceptionMessages.UnexpectedCharacter(currentChar))
             };
 
             yield return token;
@@ -68,7 +69,7 @@ public class Tokenizer : IEnumerable<Token>
 
         // TakeWhile ignores the end of the file.
         if (TakeChar() is not '"')
-            throw new Exception("Unfinished string");
+            throw new CompilerException(_currentLine, _currentColumn, CompilerExceptionMessages.UnterminatedString());
 
         return new Token(_currentLine, _start, TokenType.StringLiteral, value);
     }
