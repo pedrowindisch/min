@@ -45,7 +45,7 @@ public class Tokenizer : IEnumerable<Token>
         _source = source;
     }
 
-    private char Peek(int positions = 0) => IsAtEnd() ? '\0' : _source[_index + positions];
+    private char Peek(int positions = 0) => _source.ElementAtOrDefault(_index + positions);
     private bool IsAtEnd() => _index >= _source.Length;
 
     public IEnumerator<Token> GetEnumerator()
@@ -103,7 +103,7 @@ public class Tokenizer : IEnumerable<Token>
         while (Peek() is '.')
         {
             if (!char.IsNumber(Peek(1)))
-                throw new Exception();
+                throw new CompilerException(_currentLine, _start, CompilerExceptionType.InvalidNumberLiteral, "Numbers literals cannot end with a dot, either finish it with '.0' or, if you're trying to declare a variable, add a space before the dot.");
 
             number += TakeChar();
             number += TakeWhile(char.IsNumber);
@@ -116,7 +116,7 @@ public class Tokenizer : IEnumerable<Token>
     {
         var value = TakeWhile(char.IsLetter);
         if (!KEYWORDS.TryGetValue(value, out var keyword))
-            throw new Exception();
+            throw new CompilerException(_currentLine, _start, CompilerExceptionType.UnrecognizedKeyword);
 
         return new Token(_currentLine, _start, keyword);
     }
@@ -124,7 +124,7 @@ public class Tokenizer : IEnumerable<Token>
     private Token MatchIdentifier()
     {
         if (!char.IsLetterOrDigit(Peek(1)))
-            throw new CompilerException(_currentLine, _currentColumn, CompilerExceptionType.InvalidIdentifier, "identifiers must start with a letter or digit.");
+            throw new CompilerException(_currentLine, _currentColumn, CompilerExceptionType.InvalidIdentifier, "Identifiers must start with a letter or digit.");
 
         TakeChar();
         var identifier = TakeWhile(ch =>
@@ -132,7 +132,7 @@ public class Tokenizer : IEnumerable<Token>
             if (char.IsLetterOrDigit(ch)) return true;
             if (char.IsWhiteSpace(ch)) return false;
 
-            throw new CompilerException(_currentLine, _start, CompilerExceptionType.InvalidIdentifier, "identifiers should only contain letters and numbers.");
+            throw new CompilerException(_currentLine, _start, CompilerExceptionType.InvalidIdentifier, "Identifiers should only contain letters and numbers.");
         });
 
         return new Token(_currentLine, _start, TokenType.Identifier, identifier);

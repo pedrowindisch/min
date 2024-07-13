@@ -1,4 +1,5 @@
 using Min.Compiler;
+using Min.Compiler.Exceptions;
 
 namespace Min.Tests.Compiler.Tokenizer.Cases;
 
@@ -24,6 +25,7 @@ public class NumberLiteralTests
     {
         var tokenizer = new Min.Compiler.Tokenizer(numberLiteral);
 
-        Assert.ThrowsAny<Exception>(tokenizer.ToList);
+        var exception = Assert.Throws<CompilerException>(tokenizer.ToList);
+        Assert.Equal(CompilerExceptionType.InvalidNumberLiteral, exception.Type);
     } 
 }

@@ -1,4 +1,5 @@
 using Min.Compiler;
+using Min.Compiler.Exceptions;
 
 namespace Min.Tests.Compiler.Tokenizer.Cases;
 
@@ -55,6 +56,10 @@ public class KeywordTests
         var sourceCode = ".name nonexistentkeyword";
         var tokenizer = new Min.Compiler.Tokenizer(sourceCode);
 
-        Assert.ThrowsAny<Exception>(tokenizer.ToList);
+        var exception = Assert.Throws<CompilerException>(tokenizer.ToList);
+        Assert.Equal(
+            CompilerExceptionType.UnrecognizedKeyword,
+            exception.Type
+        );
     }
 }

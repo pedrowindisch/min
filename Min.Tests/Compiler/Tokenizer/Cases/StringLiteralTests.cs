@@ -1,4 +1,5 @@
 using Min.Compiler;
+using Min.Compiler.Exceptions;
 
 namespace Min.Tests.Compiler.Tokenizer.Cases;
 
@@ -27,6 +28,7 @@ public class StringLiteralTests
     {
         var tokenizer = new Min.Compiler.Tokenizer(stringLiteral);
 
-        Assert.ThrowsAny<Exception>(tokenizer.ToList);
+        var exception = Assert.Throws<CompilerException>(tokenizer.ToList);
+        Assert.Equal(CompilerExceptionType.UnterminatedString, exception.Type);
     }
 }
