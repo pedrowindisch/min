@@ -5,7 +5,8 @@ internal enum CompilerExceptionType
     UnexpectedCharacter,
     UnterminatedString,
     UnrecognizedKeyword,
-    UnrecognizedOperator
+    UnrecognizedOperator,
+    InvalidIdentifier,
 }
 
 internal static class CompilerExceptionTypeExtensions
@@ -17,6 +18,10 @@ internal static class CompilerExceptionTypeExtensions
             CompilerExceptionType.UnterminatedString => "Unterminated string",
             CompilerExceptionType.UnrecognizedKeyword => "Unrecognized keyword: {0}",
             CompilerExceptionType.UnrecognizedOperator => "Unrecognized operator: {0}",
+            CompilerExceptionType.InvalidIdentifier 
+                when args.Length > 0 => "Invalid identifier: {0}",
+            CompilerExceptionType.InvalidIdentifier => "Invalid identifier.",
+
             _ => throw new Exception("Exception type does not have a message."),
         }, args);
 }

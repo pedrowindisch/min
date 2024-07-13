@@ -60,10 +60,8 @@ public class Tokenizer : IEnumerable<Token>
             char currentChar = Peek();
             var token = currentChar switch
             {
-                '.' when char.IsLetterOrDigit(Peek(1)) => MatchIdentifier(),
-                '.' => throw new Exception("Expected an identifier. Identifiers start with a dot, followed by a sequence of alphanumeric characters."),
+                '.' => MatchIdentifier(),
                 char when char.IsLetter(currentChar) => MatchKeyword(),
-
                 '<' or '>' or '=' or '!' or '+' or '-' or '*' or '/' => MatchOperator(),
                 char when char.IsNumber(currentChar) => MatchNumber(),
                 '"' => MatchString(),
@@ -125,13 +123,16 @@ public class Tokenizer : IEnumerable<Token>
 
     private Token MatchIdentifier()
     {
+        if (!char.IsLetterOrDigit(Peek(1)))
+            throw new CompilerException(_currentLine, _currentColumn, CompilerExceptionType.InvalidIdentifier, "identifiers must start with a letter or digit.");
+
         TakeChar();
         var identifier = TakeWhile(ch =>
         {
             if (char.IsLetterOrDigit(ch)) return true;
             if (char.IsWhiteSpace(ch)) return false;
 
-            throw new Exception("Unexpected character");
+            throw new CompilerException(_currentLine, _start, CompilerExceptionType.InvalidIdentifier, "identifiers should only contain letters and numbers.");
         });
 
         return new Token(_currentLine, _start, TokenType.Identifier, identifier);

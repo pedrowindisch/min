@@ -1,4 +1,5 @@
 using Min.Compiler;
+using Min.Compiler.Exceptions;
 
 namespace Min.Tests.Compiler.Tokenizer.Cases;
 
@@ -34,6 +35,7 @@ public class IdentifierTests
     {
         var tokenizer = new Min.Compiler.Tokenizer($"{invalidIdentifier} int = 123");
 
-        Assert.ThrowsAny<Exception>(tokenizer.ToList);
+        var exception = Assert.Throws<CompilerException>(tokenizer.ToList);
+        Assert.Equal(CompilerExceptionType.InvalidIdentifier, exception.Type);
     }
 }
