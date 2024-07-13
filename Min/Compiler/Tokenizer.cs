@@ -5,6 +5,21 @@ namespace Min.Compiler;
 
 public class Tokenizer : IEnumerable<Token>
 {
+    private static readonly Dictionary<string, TokenType> OPERATORS = new()
+    {
+        { "=", TokenType.Assign },
+        { "==", TokenType.EqualsTo },
+        { "!=", TokenType.NotEqualsTo },
+        { ">=", TokenType.GreaterThanOrEqual },
+        { ">", TokenType.GreaterThan },
+        { "<=", TokenType.LessThanOrEqual },
+        { "<", TokenType.LessThan },
+        { "*", TokenType.Multiply },
+        { "+", TokenType.Add },
+        { "-", TokenType.Subtract },
+        { "/", TokenType.Divide },
+    };
+
     private static readonly Dictionary<string, TokenType> KEYWORDS = new()
     {
         { "int", TokenType.Int },
@@ -49,17 +64,27 @@ public class Tokenizer : IEnumerable<Token>
                 '.' => throw new Exception("Expected an identifier. Identifiers start with a dot, followed by a sequence of alphanumeric characters."),
                 char when char.IsLetter(currentChar) => MatchKeyword(),
 
-                // '>' or '=' or '!' or '+' or '-' or '*' or '/' => MatchOperator(),
+                '<' or '>' or '=' or '!' or '+' or '-' or '*' or '/' => MatchOperator(),
                 char when char.IsNumber(currentChar) => MatchNumber(),
                 '"' => MatchString(),
 
-                _ => throw new CompilerException(_currentLine, _currentColumn, CompilerExceptionMessages.UnexpectedCharacter(currentChar))
+                _ => throw new CompilerException(_currentLine, _currentColumn, CompilerExceptionType.UnexpectedCharacter, currentChar)
             };
 
             yield return token;
         }
 
         yield return new Token(_currentLine, _currentColumn, TokenType.EOF);
+    }
+
+    private Token MatchOperator()
+    {
+        var op = TakeWhile(ch => ch is '<' or '>' or '=' or '!' or '+' or '-' or '*' or '/');
+
+        if (!OPERATORS.TryGetValue(op, out var type))
+            throw new CompilerException(_currentLine, _start, CompilerExceptionType.UnrecognizedOperator, op);
+
+        return new Token(_currentLine, _start, type);        
     }
 
     private Token MatchString()
@@ -69,7 +94,7 @@ public class Tokenizer : IEnumerable<Token>
 
         // TakeWhile ignores the end of the file.
         if (TakeChar() is not '"')
-            throw new CompilerException(_currentLine, _currentColumn, CompilerExceptionMessages.UnterminatedString());
+            throw new CompilerException(_currentLine, _currentColumn, CompilerExceptionType.UnterminatedString);
 
         return new Token(_currentLine, _start, TokenType.StringLiteral, value);
     }

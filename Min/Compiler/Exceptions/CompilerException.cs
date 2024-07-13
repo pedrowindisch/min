@@ -2,12 +2,14 @@ namespace Min.Compiler.Exceptions;
 
 internal class CompilerException : Exception
 {
-    private int _line;
-    private int _column;
+    public int Line { get; init; }
+    public int Column { get; init; }
+    public CompilerExceptionType Type { get; init; }
 
-    public CompilerException(int line, int column, string message) : base(message)
+    public CompilerException(int line, int column, CompilerExceptionType type, params object[] arguments) : base(type.GenerateMessage(arguments))
     {
-        _line = line;
-        _column = column;
+        Line = line;
+        Column = column;
+        Type = type;
     }
 }
