@@ -1,6 +1,6 @@
 namespace Min.Compiler;
 
-public class Token
+internal class Token
 {
     public int Line { get; }
     public int Column { get; }

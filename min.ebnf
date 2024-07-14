@@ -24,7 +24,7 @@
 <comparison> ::= <additive> (<comparison_operator> <additive>)*
 <additive> ::= <multiplicative> (("+" | "-") <multiplicative>)*
 <multiplicative> ::= <primary> (("*" | "/") <primary>)*
-<primary> ::= <identifier> | <number> | "(" <expr> ")" | "-" <primary>
+<primary> ::= <identifier> | <number> | <string> | "true" | "false" | "(" <expr> ")" | "-" <primary>
 
 <identifier> ::= "." (<digit> | <letter>)+
 <type> ::= "int" | "float" | "string" | "bool"

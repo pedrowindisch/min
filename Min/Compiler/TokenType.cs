@@ -1,6 +1,6 @@
 namespace Min.Compiler;
 
-public enum TokenType
+internal enum TokenType
 {
     Identifier,
     NumberLiteral,

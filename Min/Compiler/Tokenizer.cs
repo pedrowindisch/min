@@ -3,7 +3,7 @@ using Min.Compiler.Exceptions;
 
 namespace Min.Compiler;
 
-public class Tokenizer : IEnumerable<Token>
+internal class Tokenizer : IEnumerable<Token>
 {
     private static readonly Dictionary<string, TokenType> OPERATORS = new()
     {

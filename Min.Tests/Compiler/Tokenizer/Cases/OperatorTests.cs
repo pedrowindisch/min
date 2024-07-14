@@ -17,7 +17,7 @@ public class OperatorTests
     [InlineData("<=", TokenType.LessThanOrEqual)]
     [InlineData(">", TokenType.GreaterThan)]
     [InlineData("<", TokenType.LessThan)]
-    public void Tokenize_Operator_ReturnsTokensList(string op, TokenType expectedType)
+    internal void Tokenize_Operator_ReturnsTokensList(string op, TokenType expectedType)
     {
         var tokenizer = new Min.Compiler.Tokenizer(op);
 
