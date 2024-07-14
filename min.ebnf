@@ -1,0 +1,31 @@
+<program> ::= <stmts>
+
+<stmts> ::= <stmt>+
+<stmt> ::=
+	<variable_decl> |
+    <if_stmt> |
+    <input_stmt> |
+    <output_stmt> 
+    
+<input_stmt> ::= <input> <comma_separated_exprs>
+<output_stmt> ::= <output> <comma_separated_exprs>
+
+<input> ::= "input" | "in"
+<output> ::= "output" | "out"
+<comma_separated_exprs> ::= <expr> ("," <expr>)*
+
+<variable_decl> ::= <identifier> ":" <type> ("=" <expr>)?
+<if_stmt> ::= "if" <expr> ":" <stmts> <else_if_stmt>* <else_stmt>?
+<else_if_stmt> ::= "else" <if_stmt>
+<else_stmt> ::= "else" ":" <stmts>
+
+<expr> ::= <digit>
+
+<identifier> ::= "." (<digit> | <letter>)+
+<type> ::= "int" | "float" | "string" | "bool"
+
+<string> ::= "\"" "\""
+<number> ::= <digit>+ ("." <digit>+)
+
+<digit> ::= [0-9]
+<letter> ::= ([a-z] | [A-Z])

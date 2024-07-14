@@ -38,7 +38,7 @@ public class KeywordTests
     [Fact]
     public void Tokenize_Types_ReturnsTokensList()
     {
-        var sourceCode = "int string bool";
+        var sourceCode = "int string bool float";
         var tokenizer = new Min.Compiler.Tokenizer(sourceCode);
 
         Assert.Equivalent(new List<Token>()
@@ -46,7 +46,22 @@ public class KeywordTests
             new Token(1, 0, TokenType.Int),
             new Token(1, 4, TokenType.String),
             new Token(1, 11, TokenType.Bool),
-            new Token(1, 15, TokenType.EOF),
+            new Token(1, 16, TokenType.Float),
+            new Token(1, 21, TokenType.EOF),
+        }, tokenizer.ToList());
+    }
+
+    [Fact]
+    public void Tokenize_ControlBranchingKeywords_ReturnsTokensList()
+    {
+        var sourceCode = "if else";
+        var tokenizer = new Min.Compiler.Tokenizer(sourceCode);
+
+        Assert.Equivalent(new List<Token>()
+        {
+            new Token(1, 0, TokenType.If),
+            new Token(1, 3, TokenType.Else),
+            new Token(1, 7, TokenType.EOF)
         }, tokenizer.ToList());
     }
 

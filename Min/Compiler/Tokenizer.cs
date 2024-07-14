@@ -65,6 +65,7 @@ public class Tokenizer : IEnumerable<Token>
                 '<' or '>' or '=' or '!' or '+' or '-' or '*' or '/' => MatchOperator(),
                 char when char.IsNumber(currentChar) => MatchNumber(),
                 '"' => MatchString(),
+                ',' => new Token(_currentLine, _start, TokenType.Comma),
 
                 _ => throw new CompilerException(_currentLine, _currentColumn, CompilerExceptionType.UnexpectedCharacter, currentChar)
             };

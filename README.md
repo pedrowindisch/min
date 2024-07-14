@@ -42,9 +42,9 @@ out .string
     .uppercase boolean
 ):
   if .uppercase:
-    print "HELLO ", upper .name # upper is a built-in function
+    output "HELLO ", upper .name # upper is a built-in function
   else:
-    print "Hello ", .name
+    output "Hello ", .name
   end
 end
 
