@@ -15,7 +15,7 @@
 <comma_separated_exprs> ::= <expr> ("," <expr>)*
 
 <variable_decl> ::= <identifier> ":" <type> ("=" <expr>)?
-<if_stmt> ::= "if" <expr> ":" <stmts> <else_if_stmt>* <else_stmt>?
+<if_stmt> ::= "if" <expr> ":" <stmts> <else_if_stmt>* <else_stmt>? "endif"
 <else_if_stmt> ::= "else" <if_stmt>
 <else_stmt> ::= "else" ":" <stmts>
 

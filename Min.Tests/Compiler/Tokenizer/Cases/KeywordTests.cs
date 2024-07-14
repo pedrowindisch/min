@@ -54,14 +54,15 @@ public class KeywordTests
     [Fact]
     public void Tokenize_ControlBranchingKeywords_ReturnsTokensList()
     {
-        var sourceCode = "if else";
+        var sourceCode = "if else endif";
         var tokenizer = new Min.Compiler.Tokenizer(sourceCode);
 
         Assert.Equivalent(new List<Token>()
         {
             new Token(1, 0, TokenType.If),
             new Token(1, 3, TokenType.Else),
-            new Token(1, 7, TokenType.EOF)
+            new Token(1, 8, TokenType.EndIf),
+            new Token(1, 13, TokenType.EOF)
         }, tokenizer.ToList());
     }
 

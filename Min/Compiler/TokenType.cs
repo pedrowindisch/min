@@ -12,6 +12,7 @@ internal enum TokenType
     Output,
     If,
     Else,
+    EndIf,
 
     Colon,
     Comma,
