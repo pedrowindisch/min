@@ -19,7 +19,12 @@
 <else_if_stmt> ::= "else" <if_stmt>
 <else_stmt> ::= "else" ":" <stmts>
 
-<expr> ::= <digit>
+<expr> ::= <comparison>
+<comparison_operator> ::= "==" | "!=" | ">=" | "<=" | ">" | "<"
+<comparison> ::= <additive> (<comparison_operator> <additive>)*
+<additive> ::= <multiplicative> (("+" | "-") <multiplicative>)*
+<multiplicative> ::= <primary> (("*" | "/") <primary>)*
+<primary> ::= <identifier> | <number> | "(" <expr> ")" | "-" <primary>
 
 <identifier> ::= "." (<digit> | <letter>)+
 <type> ::= "int" | "float" | "string" | "bool"
