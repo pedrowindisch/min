@@ -39,7 +39,7 @@ internal class Parser
     private Node Statement() =>
         Peek().Type switch
         {
-            TokenType.Identifier when Peek(1).Type is TokenType.Colon => VariableDeclaration(),
+            TokenType.Identifier when Peek(1).Type is TokenType.String or TokenType.Int or TokenType.Bool or TokenType.Float => VariableDeclaration(),
             TokenType.Identifier when Peek(1).Type is TokenType.Assign => AssignmentStatement(),
             TokenType.Identifier => throw new Exception("treat here, could be either declaration or assignment."),
 
@@ -139,7 +139,6 @@ internal class Parser
     {
         var identifier = Peek();
         Advance();
-        Advance(); // :
 
         if (!Match(TokenType.Int, TokenType.Float, TokenType.String, TokenType.Bool))
             throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidVariableDeclaration, "The provided variable type is invalid. Allowed values are: int, float, string, or bool.");

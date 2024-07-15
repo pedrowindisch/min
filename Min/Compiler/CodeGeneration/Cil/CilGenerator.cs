@@ -24,39 +24,42 @@ internal class CilGenerator : ICodeGenerator, IVisitor<string>
 
     public string Visit(VariableDeclarationNode node)
     {
-        throw new NotImplementedException();
+        var value = node.Value is not null ? node.Value.Accept(this) : "";
+        return $"{node.Name} {{ {value} }}";
     }
 
     public string Visit(LiteralNode node) =>
         node.Start.Type switch
         {
             TokenType.NumberLiteral => $"number {node.Value}",
+            TokenType.StringLiteral => $"string \"{node.Value}\"",
+            TokenType.True or TokenType.False => $"bool {node.Value}",
             _ => throw new Exception()
         };
 
     public string Visit(BinaryExpressionNode node)
     {
-        throw new NotImplementedException();
+        return $"{node.Operator} {{ {node.Left}, {node.Right} }}";
     }
 
     public string Visit(VariableNode node)
     {
-        throw new NotImplementedException();
+        return node.Name;
     }
 
     public string Visit(GroupingNode node)
     {
-        throw new NotImplementedException();
+        return $"( {node.Expression.Accept(this)} )";
     }
 
     public string Visit(AssignmentStatementNode node)
     {
-        throw new NotImplementedException();
+        return $"assign {{ {node.Identifier} = {node.Value.Accept(this)} }}";
     }
 
     public string Visit(InputStatementNode node)
     {
-        throw new NotImplementedException();
+        return $"input {{ {node.Variable.Accept(this)} }}";
     }
 
     public string Visit(OutputStatementNode node)
@@ -66,6 +69,6 @@ internal class CilGenerator : ICodeGenerator, IVisitor<string>
 
     public string Visit(IfStatementNode node)
     {
-        throw new NotImplementedException();
+        return $"if ({node.Condition!.Accept(this)}) {{ {string.Join(", ", node.Block.Select(n => n.Accept(this)))} }}";
     }
 }

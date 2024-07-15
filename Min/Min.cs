@@ -8,7 +8,13 @@ public class MinLang
 {
     public static void Main(string[] args)
     {
-        var tokens = new Tokenizer("output 12.3, 1");
+        var tokens = new Tokenizer("""
+            .nome string = "min"
+            .ano int = 2024
+
+            input .ano
+            output .nome , " nasceu em ", .ano
+        """);
         var tree = new Parser(tokens).Program();
 
         ICodeGenerator generator = new CilGenerator(tree);

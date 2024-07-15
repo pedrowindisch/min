@@ -11,7 +11,6 @@ public class VariableDeclarationTests
         var tokens = new List<Token>()
         {
             new(1, 0, TokenType.Identifier, ".name"),
-            new(1, 5, TokenType.Colon),
             new(1, 5, TokenType.String),
             new(1, 10, TokenType.EOF),
         };
@@ -30,7 +29,6 @@ public class VariableDeclarationTests
         var tokens = new List<Token>()
         {
             new(1, 0, TokenType.Identifier, ".name"),
-            new(1, 5, TokenType.Colon),
             new(1, 5, TokenType.String),
             new(1, 10, TokenType.Assign),
             new(1, 11, TokenType.StringLiteral, "min"),
