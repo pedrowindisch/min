@@ -39,6 +39,6 @@ public class AssignmentStatementTests
         var parser = new Min.Compiler.Parser(tokens);
 
         var exception = Assert.Throws<CompilerException>(parser.Program);
-        // Assert.Equal(CompilerExceptionType.InvalidVariableDeclaration, exception.Type);
+        Assert.Equal(CompilerExceptionType.InvalidAssignmentValue, exception.Type);
     }
 }

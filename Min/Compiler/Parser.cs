@@ -95,9 +95,13 @@ internal class Parser
         var start = Peek();
         Advance();
 
-        var values = CommaSeparatedExpressions();
+        if (!Match(TokenType.Identifier))
+            throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.ExpectedKeyword, "a variable/identifier");
 
-        return new InputStatementNode(start, values);
+        var identifier = Peek();
+        Advance();
+
+        return new InputStatementNode(start, new VariableNode(identifier));
     }
 
     private Node OutputStatement()
@@ -117,7 +121,15 @@ internal class Parser
         while (Match(TokenType.Comma))
         {
             Advance();
-            expressions.Add(Expression());
+            
+            try
+            {
+                expressions.Add(Expression());
+            }
+            catch (CompilerException ex) when (ex.Type is CompilerExceptionType.MissingExpression)
+            {
+                throw new CompilerException(ex.Line, ex.Column, CompilerExceptionType.MissingValueAfterComma);
+            }
         }
 
         return expressions;
@@ -166,7 +178,7 @@ internal class Parser
         }
         catch (CompilerException)
         {
-            throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidVariableDeclaration, "To intiialize a variable, you must provide either a number, string or an identifier.");
+            throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidAssignmentValue, "Invalid value.");
         }
 
         return new AssignmentStatementNode(identifier, value);
@@ -322,6 +334,6 @@ internal class Parser
             return new GroupingNode(expr);
         }
 
-        throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidExpression, "An expression can only contain numbers, strings or identifiers.");
+        throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.MissingExpression, "Missing expression.");
     }
 }

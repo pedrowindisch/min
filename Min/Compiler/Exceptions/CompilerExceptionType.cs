@@ -10,10 +10,14 @@ internal enum CompilerExceptionType
     InvalidNumberLiteral,
 
     UnexpectedEOF,
+    ExpectedKeyword,
     InvalidVariableDeclaration,
     UnclosedParenthesis,
     EmptyExpression,
     InvalidExpression,
+    MissingValueAfterComma,
+    MissingExpression,
+    InvalidAssignmentValue
 }
 
 internal static class CompilerExceptionTypeExtensions
@@ -23,35 +27,22 @@ internal static class CompilerExceptionTypeExtensions
         {
             CompilerExceptionType.UnexpectedCharacter
                 when args is [char ch] => $"Expected {ch}.",
-            CompilerExceptionType.UnexpectedCharacter
-                when args is [string message] => message,
+            _ when args is [string message] => message,
+            
             CompilerExceptionType.UnexpectedCharacter => "Unexpected character: {0}",
-
             CompilerExceptionType.UnterminatedString => "Unterminated string",
             CompilerExceptionType.UnrecognizedKeyword => "Unrecognized keyword",
             CompilerExceptionType.UnrecognizedOperator => "Unrecognized operator: {0}",
-
-            CompilerExceptionType.UnexpectedEOF
-                when args is [string message] => message,
             CompilerExceptionType.UnexpectedEOF => "Unexpected end of file.",
-
-            CompilerExceptionType.InvalidIdentifier 
-                when args is [string message] => message,
             CompilerExceptionType.InvalidIdentifier => "Invalid identifier.",
-            
-            CompilerExceptionType.InvalidNumberLiteral 
-                when args is [string message] => message,
             CompilerExceptionType.InvalidNumberLiteral => "Malformed number.",
-
-            CompilerExceptionType.InvalidVariableDeclaration
-                when args is [string message] => message,
-
             CompilerExceptionType.UnclosedParenthesis => "Unclosed parenthesis.",
             CompilerExceptionType.EmptyExpression => "Parenthesis cannot be empty.",
+            CompilerExceptionType.MissingValueAfterComma => "Missing value after comma.",
+            CompilerExceptionType.MissingExpression => "Missing expression.",
+            CompilerExceptionType.ExpectedKeyword
+                when args is [string keyword] => $"Expected {keyword}.",
 
-            CompilerExceptionType.InvalidExpression
-                when args is [string message] => message,
-
-            _ => throw new Exception("Exception type does not have a message."),
+            _ => throw new Exception("Exception type with given arguments (or no arguments) does not have a message."),
         }, args);
 }

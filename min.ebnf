@@ -10,7 +10,7 @@
 
 <assignment_stmt> ::= <identifier> "=" <expr>
     
-<input_stmt> ::= <input> <comma_separated_exprs>
+<input_stmt> ::= <input> <identifier>
 <output_stmt> ::= <output> <comma_separated_exprs>
 
 <input> ::= "input" | "in"

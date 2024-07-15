@@ -2,11 +2,11 @@ namespace Min.Compiler.Nodes;
 
 internal class InputStatementNode : Node
 {
-    public List<Node> Values { get; set; }
+    public VariableNode Variable { get; set; }
 
-    public InputStatementNode(Token start, List<Node> values) : base(start)
+    public InputStatementNode(Token start, VariableNode variable) : base(start)
     {
-        Values = values;
+        Variable = variable;
     }
 
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
