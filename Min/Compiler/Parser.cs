@@ -48,6 +48,7 @@ internal class Parser
 
             TokenType.If => IfStatement(),
 
+            TokenType.EOF => throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedEOF),
             _ => throw new Exception("treat here...")
         };
 
