@@ -2,14 +2,18 @@ namespace Min.Compiler.Nodes;
 
 internal class IfStatementNode : Node
 {
-    public Node Condition { get; init; }
+    public Node? Condition { get; init; }
     public List<Node> Block { get; init; }
     public IfStatementNode? Else { get; init; }
 
-    public IfStatementNode(Token start, Node condition, List<Node> block) : base(start)
+    public IfStatementNode(Token start, List<Node> block) : base(start)
+    {
+        Block = block;
+    }
+
+    public IfStatementNode(Token start, Node condition, List<Node> block) : this(start, block)
     {
         Condition = condition;
-        Block = block;
     }
 
     public IfStatementNode(Token start, Node condition, List<Node> block, IfStatementNode? elseNode) : this(start, condition, block)

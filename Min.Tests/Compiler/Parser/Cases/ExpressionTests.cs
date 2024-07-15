@@ -99,4 +99,26 @@ public class ExpressionTests
         var parser = new Min.Compiler.Parser(tokens);
         var exception = Assert.Throws<CompilerException>(parser.Program);        
     }
+
+    [Fact]
+    public void Parse_GroupingWithoutClosingParenthesis_ThrowsException()
+    {
+        var tokens = new List<Token>()
+        {
+            new(1, 0, TokenType.Output),
+            new(1, 0, TokenType.NumberLiteral, "1"),
+            new(1, 0, TokenType.Add),
+            new(1, 0, TokenType.LeftParenthesis),
+            new(1, 0, TokenType.NumberLiteral, "2"),
+            new(1, 0, TokenType.Add),
+            new(1, 0, TokenType.NumberLiteral, "3"),
+            new(2, 0, TokenType.Identifier, ".nome"),
+            new(2, 0, TokenType.Int),
+            new(1, 0, TokenType.EOF),
+        };
+
+        var parser = new Min.Compiler.Parser(tokens);
+        var exception = Assert.Throws<CompilerException>(parser.Program);
+        Assert.Equal(CompilerExceptionType.UnclosedParenthesis, exception.Type);        
+    }
 }

@@ -25,7 +25,6 @@ public class AssignmentStatementTests
         }, parser.Program());
     }
 
-
     [Fact(DisplayName = "Should throw an exception when evaluating an invalid assignment statement.")]
     public void Parse_InvalidAssignmentsStatement_ThrowsException()
     {

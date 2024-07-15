@@ -186,23 +186,30 @@ internal class Parser
             throw new Exception("expected a condition...");
         }
 
-        var block = Statements();
-        IfStatementNode? elseNode = null;
-
-        if (Match(TokenType.Else))
-        {
-            Advance();
-            if (Match(TokenType.If))
-                Advance();
-
-            elseNode = IfStatement();
-        }
-
-        if (!Match(TokenType.EndIf))
-            throw new Exception("Expected end if...");
+        if (!Match(TokenType.Colon))
+            throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedCharacter, "The condition of an if statement must be followed by a colon.");
 
         Advance();
-        return new IfStatementNode(start, condition, block, elseNode);
+
+        List<Node> block = [];
+        while (!Match(TokenType.EndIf, TokenType.Else))
+        {
+            try
+            {
+                block.Add(Statement());
+            }
+            catch (CompilerException ex) when (ex.Type == CompilerExceptionType.UnexpectedEOF)
+            {
+                throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedEOF, "You must finish your if block with a 'endif' keyword.");
+            }
+        }
+
+        // IfStatementNode? elseNode = null;
+        // if (Match(TokenType.Else))
+        //     elseNode = ElseStatement();
+
+        Advance(); // endif
+        return new IfStatementNode(start, condition, block);
     }
 
     // private void ElseIfStatement()
@@ -210,9 +217,12 @@ internal class Parser
 
     // }
 
-    // private void ElseStatement()
+    // private IfStatementNode ElseStatement()
     // {
+    //     if (!Match(TokenType.Else))
+    //         throw new Exception("internal error -- shouldnt be called...");
 
+    //     if (Match())
     // }
 
     private Node Expression()
@@ -291,16 +301,26 @@ internal class Parser
         // @todo punctuation are not implemented in the tokenizer...
         if (Match(TokenType.LeftParenthesis))
         {
-            Advance();
-            var expr = Expression();
+            var start = Peek();
 
+            Advance();
+            Node expr;
+            try
+            {
+                expr = Expression();
+            }
+            catch (CompilerException ex) when (ex.Type == CompilerExceptionType.UnexpectedCharacter)
+            {
+                throw new CompilerException(ex.Line, ex.Column, CompilerExceptionType.UnclosedParenthesis);
+            }
+            
             if (!Match(TokenType.RightParenthesis))
-                throw new Exception("treat it later - no right parenthesis, unclosed expression");
+                throw new CompilerException(start.Line, start.Column, CompilerExceptionType.UnclosedParenthesis, Peek());
 
             Advance();
             return new GroupingNode(expr);
         }
 
-        throw new Exception("treat it later");
+        throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidExpression, "An expression can only contain numbers, strings or identifiers.");
     }
 }

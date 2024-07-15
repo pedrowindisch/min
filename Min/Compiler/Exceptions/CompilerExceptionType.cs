@@ -9,7 +9,11 @@ internal enum CompilerExceptionType
     InvalidIdentifier,
     InvalidNumberLiteral,
 
+    UnexpectedEOF,
     InvalidVariableDeclaration,
+    UnclosedParenthesis,
+    EmptyExpression,
+    InvalidExpression,
 }
 
 internal static class CompilerExceptionTypeExtensions
@@ -17,21 +21,36 @@ internal static class CompilerExceptionTypeExtensions
     public static string GenerateMessage(this CompilerExceptionType type, params object[] args) => 
         string.Format(type switch
         {
+            CompilerExceptionType.UnexpectedCharacter
+                when args is [char ch] => $"Expected {ch}.",
+            CompilerExceptionType.UnexpectedCharacter
+                when args is [string message] => message,
             CompilerExceptionType.UnexpectedCharacter => "Unexpected character: {0}",
+
             CompilerExceptionType.UnterminatedString => "Unterminated string",
             CompilerExceptionType.UnrecognizedKeyword => "Unrecognized keyword",
             CompilerExceptionType.UnrecognizedOperator => "Unrecognized operator: {0}",
-            
+
+            CompilerExceptionType.UnexpectedEOF
+                when args is [string message] => message,
+            CompilerExceptionType.UnexpectedEOF => "Unexpected end of file.",
+
             CompilerExceptionType.InvalidIdentifier 
-                when args.Length == 1 => (string) args[0],
+                when args is [string message] => message,
             CompilerExceptionType.InvalidIdentifier => "Invalid identifier.",
             
             CompilerExceptionType.InvalidNumberLiteral 
-                when args.Length == 1 => (string) args[0],
+                when args is [string message] => message,
             CompilerExceptionType.InvalidNumberLiteral => "Malformed number.",
 
             CompilerExceptionType.InvalidVariableDeclaration
-                when args.Length == 1 => (string) args[0],
+                when args is [string message] => message,
+
+            CompilerExceptionType.UnclosedParenthesis => "Unclosed parenthesis.",
+            CompilerExceptionType.EmptyExpression => "Parenthesis cannot be empty.",
+
+            CompilerExceptionType.InvalidExpression
+                when args is [string message] => message,
 
             _ => throw new Exception("Exception type does not have a message."),
         }, args);
