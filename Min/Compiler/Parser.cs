@@ -5,15 +5,15 @@ namespace Min.Compiler;
 
 internal class Parser
 {
-    private IEnumerable<Token> _tokens { get; init; }
+    private List<Token> Tokens { get; init; }
     private int _current = 0;
     
     public Parser(IEnumerable<Token> tokens)
     {
-        _tokens = tokens;
+        Tokens = tokens.ToList();
     }
 
-    private Token Peek(int positions = 0) => _tokens.ElementAtOrDefault(_current + positions) ?? _tokens.Last();
+    private Token Peek(int positions = 0) => Tokens.ElementAtOrDefault(_current + positions) ?? Tokens.Last();
 
     public bool Match(TokenType type) => Peek().Type == type;
     public bool Match(params TokenType[] types) => types.Contains(Peek().Type);
