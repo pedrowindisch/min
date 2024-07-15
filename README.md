@@ -24,7 +24,7 @@ else if .year < 2010:
   print "before 2010"
 else:
   print "2010 or after"
-end
+endif
 
 # Input and output (with aliases)
 input .string
@@ -41,8 +41,8 @@ out .string
     output "HELLO ", upper .name # upper is a built-in function
   else:
     output "Hello ", .name
-  end
-end
+  endif
+endfunc
 
 # Calling functions
 .sayHello "min", true # This should output "HELLO MIN"

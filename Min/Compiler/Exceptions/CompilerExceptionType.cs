@@ -8,6 +8,8 @@ internal enum CompilerExceptionType
     UnrecognizedOperator,
     InvalidIdentifier,
     InvalidNumberLiteral,
+
+    InvalidVariableDeclaration,
 }
 
 internal static class CompilerExceptionTypeExtensions
@@ -27,6 +29,9 @@ internal static class CompilerExceptionTypeExtensions
             CompilerExceptionType.InvalidNumberLiteral 
                 when args.Length == 1 => (string) args[0],
             CompilerExceptionType.InvalidNumberLiteral => "Malformed number.",
+
+            CompilerExceptionType.InvalidVariableDeclaration
+                when args.Length == 1 => (string) args[0],
 
             _ => throw new Exception("Exception type does not have a message."),
         }, args);

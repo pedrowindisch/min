@@ -3,9 +3,12 @@
 <stmts> ::= <stmt>+
 <stmt> ::=
 	<variable_decl> |
+    <assignment_stmt> |
     <if_stmt> |
     <input_stmt> |
     <output_stmt> 
+
+<assignment_stmt> ::= <identifier> "=" <expr>
     
 <input_stmt> ::= <input> <comma_separated_exprs>
 <output_stmt> ::= <output> <comma_separated_exprs>
