@@ -49,7 +49,11 @@ internal class Parser
             TokenType.If => IfStatement(),
 
             TokenType.EOF => throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedEOF),
-            _ => throw new Exception("treat here...")
+
+            TokenType.Comma or TokenType.Colon => 
+                throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedCharacter, "this punctuation mark was not supposed to be here."),
+            
+            _ => throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedToken, "Expected a statement.")
         };
 
         // var startToken = Peek();

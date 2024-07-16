@@ -1,7 +1,7 @@
 .nome string
 in .nome
 
-if .nome == "pedro":
+if .nome == "pedro"::
     output .nome, " comneça com p"
     output "deseja continuar?"
     .desejaContinuar bool

@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Localization;
+
 namespace Min.Compiler.Exceptions;
 
 public enum CompilerExceptionType
@@ -17,7 +19,8 @@ public enum CompilerExceptionType
     InvalidExpression,
     MissingValueAfterComma,
     MissingExpression,
-    InvalidAssignmentValue
+    InvalidAssignmentValue,
+    UnexpectedToken,
 }
 
 internal static class CompilerExceptionTypeExtensions
@@ -25,12 +28,12 @@ internal static class CompilerExceptionTypeExtensions
     public static string GenerateMessage(this CompilerExceptionType type, params object[] args) => 
         string.Format(type switch
         {
-            CompilerExceptionType.UnexpectedCharacter
-                when args is [char ch] => $"Expected {ch}.",
+            CompilerExceptionType.ExpectedKeyword
+                when args is [string keyword] => $"Expected {keyword}.",
             CompilerExceptionType.UnrecognizedOperator
                 when args is [string op] => $"Unrecognized operator: {op}",
             CompilerExceptionType.UnexpectedCharacter
-                when args is [char ch] => $"Unexpected character: {ch}",
+                when args is [char] or [string] => $"Unexpected character: {args[0]}",
             _ when args is [string message] => message,
             
             CompilerExceptionType.UnterminatedString => "Unterminated string",
@@ -42,8 +45,6 @@ internal static class CompilerExceptionTypeExtensions
             CompilerExceptionType.EmptyExpression => "Parenthesis cannot be empty.",
             CompilerExceptionType.MissingValueAfterComma => "Missing value after comma.",
             CompilerExceptionType.MissingExpression => "Missing expression.",
-            CompilerExceptionType.ExpectedKeyword
-                when args is [string keyword] => $"Expected {keyword}.",
 
             _ => throw new Exception("Exception type with given arguments (or no arguments) does not have a message."),
         }, args);

@@ -85,18 +85,13 @@ internal class Tokenizer : IEnumerable<Token>
             Peek() switch
             {
                 ',' => TokenType.Comma,
-                ':' => TokenType.Colon
+                ':' => TokenType.Colon,
+
+                _ => throw new Exception("should not be called")
             });     
 
         TakeChar();
         return token;   
-    }
-
-    private Token MatchComma()
-    {
-        TakeChar();
-
-        return new Token(_currentLine, _start, TokenType.Comma);
     }
 
     private Token MatchOperator()
