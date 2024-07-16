@@ -1,5 +1,6 @@
 using Min.Compiler.CodeGeneration.Cil;
 using Min.Compiler.Exceptions;
+using Spectre.Console;
 
 namespace Min.Cli;
 
@@ -24,7 +25,7 @@ internal class CommandHandlers
             var formatter = new CompilerExceptionFormatter(sourceCode);
             var report = formatter.GenerateErrorReport(ex);
 
-            Console.WriteLine(report);
+            AnsiConsole.Write(report);
         }
     }
 }

@@ -1,5 +1,7 @@
+using System.Linq;
 using System.Text;
 using Min.Compiler.Exceptions;
+using Spectre.Console;
 
 namespace Min.Cli;
 
@@ -13,7 +15,7 @@ internal class CompilerExceptionFormatter
     }
 
     private (int, string) GetLine(int line) => (line, Lines.ElementAt(line - 1)); // Lines are not zero-indexed during the tokenization.
-    public string GenerateErrorReport(CompilerException exception)
+    public Markup GenerateErrorReport(CompilerException exception)
     {
         List<(int Line, string Content)> linesToPrint = [];
 
@@ -26,24 +28,25 @@ internal class CompilerExceptionFormatter
             linesToPrint.Add(GetLine(exception.Line + 1));
 
         var basePadding = linesToPrint.Select(l => l.Line.ToString().Length).Max() + 1;
-        var report = new StringBuilder(); 
+        var report = new List<string>(); 
 
         foreach (var (lineNumber, lineContent) in linesToPrint)
         {
-            report.Append($"{lineNumber.ToString().PadLeft(basePadding)} | ");
-            report.AppendLine(lineContent);
+            var markup = $"{lineNumber.ToString().PadLeft(basePadding)} | ";
+            markup += lineContent;
 
             if (lineNumber == exception.Line)
             {
-                report.Append($"{"".PadLeft(basePadding)} |");
-                report.Append(new string(' ', exception.Column + 1));
-                report.AppendLine("^");
+                markup = "[bold red]" + markup + '\n';
+                
+                markup += $"{"".PadLeft(basePadding)} |";
+                markup += new string(' ', exception.Column + 1);
+                markup += $"^ [red]{exception.Message}[/] [/]";
             }
+
+            report.Add(markup);
         }
 
-        report.AppendLine();
-        report.AppendLine(exception.Message);
-
-        return report.ToString();
+        return new Markup(string.Join('\n', report));
     }
 }
