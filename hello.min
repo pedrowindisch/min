@@ -1,4 +1,9 @@
-output .nome
-output .nome___
-output k;
-output .nome
+.nome string
+in .nome
+
+if .nome == "pedro":
+    output .nome, " comneça com p"
+    output "deseja continuar?"
+    .desejaContinuar bool
+    in .desejaContinuar
+endif

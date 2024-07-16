@@ -66,7 +66,7 @@ internal class Tokenizer : IEnumerable<Token>
                 '<' or '>' or '=' or '!' or '+' or '-' or '*' or '/' => MatchOperator(),
                 char when char.IsNumber(currentChar) => MatchNumber(),
                 '"' => MatchString(),
-                ',' => MatchComma(),
+                ',' or ':' => MatchPunctuation(),
 
                 _ => throw new CompilerException(_currentLine, _currentColumn, CompilerExceptionType.UnexpectedCharacter, currentChar)
             };
@@ -75,6 +75,21 @@ internal class Tokenizer : IEnumerable<Token>
         }
 
         yield return new Token(_currentLine, _currentColumn, TokenType.EOF);
+    }
+
+    private Token MatchPunctuation()
+    {
+        var token = new Token(
+            _currentLine, 
+            _start, 
+            Peek() switch
+            {
+                ',' => TokenType.Comma,
+                ':' => TokenType.Colon
+            });     
+
+        TakeChar();
+        return token;   
     }
 
     private Token MatchComma()
