@@ -139,7 +139,7 @@ internal class Tokenizer : IEnumerable<Token>
         var identifier = TakeWhile(ch =>
         {
             if (char.IsLetterOrDigit(ch)) return true;
-            if (char.IsWhiteSpace(ch)) return false;
+            if (char.IsWhiteSpace(ch) || ch is ',') return false;
 
             throw new CompilerException(_currentLine, _start, CompilerExceptionType.InvalidIdentifier, "Identifiers should only contain letters and numbers.");
         });

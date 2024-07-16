@@ -13,7 +13,7 @@ public class MinLang
             .ano int = 2024
 
             input .ano
-            output .nome , " nasceu em ", .ano
+            output .nome, " nasceu em ",.ano
         """);
         var tree = new Parser(tokens).Program();
 
