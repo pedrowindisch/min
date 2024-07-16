@@ -1,3 +1,5 @@
+using Min.Compiler.CodeGeneration.Cil;
+
 namespace Min.Cli;
 
 internal class CommandHandlers
@@ -9,7 +11,8 @@ internal class CommandHandlers
 
         var compiler = new Min(File.ReadAllText(fileInfo.FullName));
         compiler.Compile(new(
-            Path.ChangeExtension(fileInfo.FullName, ".comp")
+            Path.ChangeExtension(fileInfo.FullName, ".comp"),
+            new CilGenerator()
         ));
     }
 }

@@ -3,13 +3,13 @@ using Min.Compiler.Nodes;
 
 namespace Min.Compiler.CodeGeneration.Cil;
 
-internal class CilGenerator(List<Node> nodes) : CodeGenerator(nodes), IVisitor<string>
+public class CilGenerator : ICodeGenerator, IVisitor<string>
 {
-    public override string Generate()
+    public string Generate(List<Node> nodes)
     {
         var code = new StringBuilder();
 
-        foreach (var node in _nodes)
+        foreach (var node in nodes)
             code.AppendLine(node.Accept(this));
 
         return code.ToString();        

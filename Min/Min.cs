@@ -22,13 +22,10 @@ public class Min(string sourceCode)
         var tokenizer = new Tokenizer(_sourceCode).ToList();
         var tree = new Parser(tokenizer).Program();
 
-        var generator = new CilGenerator(tree);
-        var output = generator.Generate();
+        var output = options
+            .Generator
+            .Generate(tree);
 
         File.WriteAllText(options.OutputFilePath, output);
-    }
-
-    public class Compiler
-    {
     }
 }
