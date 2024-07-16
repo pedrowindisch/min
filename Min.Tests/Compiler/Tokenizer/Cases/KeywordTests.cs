@@ -1,7 +1,7 @@
 using Min.Compiler;
 using Min.Compiler.Exceptions;
 
-namespace Min.Tests.Compiler.Tokenizer.Cases;
+namespace Min.Tests.Compiler.TokenizerTests.Cases;
 
 public class KeywordTests
 {
@@ -9,7 +9,7 @@ public class KeywordTests
     public void Tokenize_InputOutputKeywords_ReturnsTokensList()
     {
         var sourceCode = "input .nome\noutput .nome";
-        var tokenizer = new Min.Compiler.Tokenizer(sourceCode);
+        var tokenizer = new Tokenizer(sourceCode);
 
         Assert.Equivalent(new List<Token>()
         {
@@ -24,7 +24,7 @@ public class KeywordTests
     public void Tokenize_InOutKeywords_ReturnsTokensList()
     {
         var sourceCode = "in .nome\nout .nome";
-        var tokenizer = new Min.Compiler.Tokenizer(sourceCode);
+        var tokenizer = new Tokenizer(sourceCode);
 
         Assert.Equivalent(new List<Token>()
         {
@@ -39,7 +39,7 @@ public class KeywordTests
     public void Tokenize_Types_ReturnsTokensList()
     {
         var sourceCode = "int string bool float";
-        var tokenizer = new Min.Compiler.Tokenizer(sourceCode);
+        var tokenizer = new Tokenizer(sourceCode);
 
         Assert.Equivalent(new List<Token>()
         {
@@ -55,7 +55,7 @@ public class KeywordTests
     public void Tokenize_ControlBranchingKeywords_ReturnsTokensList()
     {
         var sourceCode = "if else endif";
-        var tokenizer = new Min.Compiler.Tokenizer(sourceCode);
+        var tokenizer = new Tokenizer(sourceCode);
 
         Assert.Equivalent(new List<Token>()
         {
@@ -70,7 +70,7 @@ public class KeywordTests
     public void Tokenize_UnrecognizedKeyword_ThrowsException()
     {
         var sourceCode = ".name nonexistentkeyword";
-        var tokenizer = new Min.Compiler.Tokenizer(sourceCode);
+        var tokenizer = new Tokenizer(sourceCode);
 
         var exception = Assert.Throws<CompilerException>(tokenizer.ToList);
         Assert.Equal(

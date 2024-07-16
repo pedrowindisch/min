@@ -1,7 +1,7 @@
 using Min.Compiler;
 using Min.Compiler.Exceptions;
 
-namespace Min.Tests.Compiler.Tokenizer.Cases;
+namespace Min.Tests.Compiler.TokenizerTests.Cases;
 
 [Trait("Tokenizer", "Identifier tests")]
 public class IdentifierTests
@@ -15,7 +15,7 @@ public class IdentifierTests
     public void ValidIdentifier(string identifier)
     {
         var sourceCode = $"{identifier} int";
-        var tokenizer = new Min.Compiler.Tokenizer(sourceCode);
+        var tokenizer = new Tokenizer(sourceCode);
 
         Assert.Equivalent(new List<Token>
         {
@@ -33,7 +33,7 @@ public class IdentifierTests
     [InlineData(".name_with_underscores")]
     public void InvalidIdentifier_ThrowsException(string invalidIdentifier)
     {
-        var tokenizer = new Min.Compiler.Tokenizer($"{invalidIdentifier} int = 123");
+        var tokenizer = new Tokenizer($"{invalidIdentifier} int = 123");
 
         var exception = Assert.Throws<CompilerException>(tokenizer.ToList);
         Assert.Equal(CompilerExceptionType.InvalidIdentifier, exception.Type);

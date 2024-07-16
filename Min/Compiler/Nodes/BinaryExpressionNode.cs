@@ -1,6 +1,6 @@
 namespace Min.Compiler.Nodes;
 
-internal class BinaryExpressionNode : Node
+public class BinaryExpressionNode : Node
 {
     public Node Left { get; init; }
     public Node Right { get; init; }

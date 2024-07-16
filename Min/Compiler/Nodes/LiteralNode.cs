@@ -1,6 +1,6 @@
 namespace Min.Compiler.Nodes;
 
-internal class LiteralNode : Node
+public class LiteralNode : Node
 {
     public string Value { get; init; }
 

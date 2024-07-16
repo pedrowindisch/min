@@ -3,16 +3,9 @@ using Min.Compiler.Nodes;
 
 namespace Min.Compiler.CodeGeneration.Cil;
 
-internal class CilGenerator : ICodeGenerator, IVisitor<string>
+internal class CilGenerator(List<Node> nodes) : CodeGenerator(nodes), IVisitor<string>
 {
-    private List<Node> _nodes { get; init; }
-
-    public CilGenerator(List<Node> nodes)
-    {
-        _nodes = nodes;
-    }
-
-    public string Generate()
+    public override string Generate()
     {
         var code = new StringBuilder();
 

@@ -1,6 +1,6 @@
 namespace Min.Compiler.Nodes;
 
-internal class IfStatementNode : Node
+public class IfStatementNode : Node
 {
     public Node? Condition { get; init; }
     public List<Node> Block { get; init; }

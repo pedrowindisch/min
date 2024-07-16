@@ -2,7 +2,7 @@ using Min.Compiler;
 using Min.Compiler.Exceptions;
 using Min.Compiler.Nodes;
 
-namespace Min.Tests.Compiler.Parser.Cases;
+namespace Min.Tests.Compiler.ParserTests.Cases;
 
 public class IfStatementTests
 {
@@ -23,7 +23,7 @@ public class IfStatementTests
             new Token(3, 0, TokenType.EOF)
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
         Assert.Equivalent(new List<Node>()
         {
             new IfStatementNode(
@@ -56,7 +56,7 @@ public class IfStatementTests
             new Token(3, 0, TokenType.EOF)
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
         
         var exception = Assert.Throws<CompilerException>(parser.Program);
         Assert.Equal(CompilerExceptionType.UnexpectedEOF, exception.Type);

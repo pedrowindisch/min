@@ -1,7 +1,7 @@
 using Min.Compiler;
 using Min.Tests.Utils;
 
-namespace Min.Tests.Compiler.Tokenizer;
+namespace Min.Tests.Compiler.TokenizerTests;
 
 [Trait("Tokenizer", "General tests")]
 public class TokenizerTests
@@ -11,7 +11,7 @@ public class TokenizerTests
     // {
     //     var sourceCode = "# this is a comment";
 
-    //     var tokenizer = new Min.Compiler.Tokenizer(sourceCode);
+    //     var tokenizer = new Tokenizer(sourceCode);
 
     //     Assert.Equivalent(new List<Token>
     //     {

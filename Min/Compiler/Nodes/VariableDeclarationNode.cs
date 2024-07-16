@@ -2,7 +2,7 @@ using Min.Compiler.Exceptions;
 
 namespace Min.Compiler.Nodes;
 
-internal class VariableDeclarationNode : Node
+public class VariableDeclarationNode : Node
 {
     public TokenType VariableType { get; init; }
     public string Name { get; init; }

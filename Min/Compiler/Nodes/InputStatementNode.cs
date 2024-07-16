@@ -1,6 +1,6 @@
 namespace Min.Compiler.Nodes;
 
-internal class InputStatementNode : Node
+public class InputStatementNode : Node
 {
     public VariableNode Variable { get; set; }
 

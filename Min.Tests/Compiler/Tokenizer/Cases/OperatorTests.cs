@@ -1,7 +1,7 @@
 using Min.Compiler;
 using Min.Compiler.Exceptions;
 
-namespace Min.Tests.Compiler.Tokenizer.Cases;
+namespace Min.Tests.Compiler.TokenizerTests.Cases;
 
 public class OperatorTests
 {
@@ -19,7 +19,7 @@ public class OperatorTests
     [InlineData("<", TokenType.LessThan)]
     internal void Tokenize_Operator_ReturnsTokensList(string op, TokenType expectedType)
     {
-        var tokenizer = new Min.Compiler.Tokenizer(op);
+        var tokenizer = new Tokenizer(op);
 
         Assert.Equivalent(new List<Token>()
         {
@@ -37,7 +37,7 @@ public class OperatorTests
     [InlineData("//")]
     public void Tokenize_Operator_ThrowsException(string invalidOperator)
     {
-        var tokenizer = new Min.Compiler.Tokenizer(invalidOperator);
+        var tokenizer = new Tokenizer(invalidOperator);
 
         var exception = Assert.Throws<CompilerException>(tokenizer.ToList);
         Assert.Equal(

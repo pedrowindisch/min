@@ -2,7 +2,7 @@ using Min.Compiler;
 using Min.Compiler.Exceptions;
 using Min.Compiler.Nodes;
 
-namespace Min.Tests.Compiler.Parser.Cases;
+namespace Min.Tests.Compiler.ParserTests.Cases;
 
 public class AssignmentStatementTests
 {
@@ -17,7 +17,7 @@ public class AssignmentStatementTests
             new(1, 10, TokenType.EOF),
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
 
         Assert.Equivalent(new List<Node>()
         {
@@ -36,7 +36,7 @@ public class AssignmentStatementTests
             new(1, 10, TokenType.EOF),
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
 
         var exception = Assert.Throws<CompilerException>(parser.Program);
         Assert.Equal(CompilerExceptionType.InvalidAssignmentValue, exception.Type);

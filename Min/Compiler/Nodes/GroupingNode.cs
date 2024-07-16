@@ -1,6 +1,6 @@
 namespace Min.Compiler.Nodes;
 
-internal class GroupingNode : Node
+public class GroupingNode : Node
 {
     public Node Expression { get; init; }
 

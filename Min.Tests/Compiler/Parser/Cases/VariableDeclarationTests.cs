@@ -1,7 +1,7 @@
 using Min.Compiler;
 using Min.Compiler.Nodes;
 
-namespace Min.Tests.Compiler.Parser.Cases;
+namespace Min.Tests.Compiler.ParserTests.Cases;
 
 public class VariableDeclarationTests
 {
@@ -15,7 +15,7 @@ public class VariableDeclarationTests
             new(1, 10, TokenType.EOF),
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
 
         Assert.Equivalent(new List<Node>()
         {
@@ -35,7 +35,7 @@ public class VariableDeclarationTests
             new(1, 15, TokenType.EOF),
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
 
         Assert.Equivalent(new List<Node>()
         {

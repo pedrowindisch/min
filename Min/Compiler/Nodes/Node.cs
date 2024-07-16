@@ -1,6 +1,6 @@
 namespace Min.Compiler.Nodes;
 
-internal abstract class Node(Token start)
+public abstract class Node(Token start)
 {
     public Token Start { get; init; } = start;
 

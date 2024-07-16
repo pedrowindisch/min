@@ -1,7 +1,8 @@
 using Min.Compiler;
 using Min.Compiler.Exceptions;
+using Compiler = Min.Compiler;
 
-namespace Min.Tests.Compiler.Tokenizer.Cases;
+namespace Min.Tests.Compiler.TokenizerTests.Cases;
 
 public class StringLiteralTests
 {
@@ -12,7 +13,7 @@ public class StringLiteralTests
     [InlineData(@""".123""")]
     public void Tokenize_StringLiterals_ReturnsTokensList(string stringLiteral)
     {
-        var tokenizer = new Min.Compiler.Tokenizer(stringLiteral);
+        var tokenizer = new Tokenizer(stringLiteral);
 
         Assert.Equivalent(new List<Token>
         {
@@ -26,7 +27,7 @@ public class StringLiteralTests
     [InlineData(@"""testing")]
     public void Tokenize_InvalidStringLiterals_ThrowsException(string stringLiteral)
     {
-        var tokenizer = new Min.Compiler.Tokenizer(stringLiteral);
+        var tokenizer = new Tokenizer(stringLiteral);
 
         var exception = Assert.Throws<CompilerException>(tokenizer.ToList);
         Assert.Equal(CompilerExceptionType.UnterminatedString, exception.Type);

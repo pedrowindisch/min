@@ -1,6 +1,6 @@
 namespace Min.Compiler.Nodes;
 
-internal class AssignmentStatementNode : Node
+public class AssignmentStatementNode : Node
 {
     public string Identifier { get; init; }
     public Node Value { get; init; }

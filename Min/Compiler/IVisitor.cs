@@ -2,7 +2,7 @@ using Min.Compiler.Nodes;
 
 namespace Min.Compiler;
 
-internal interface IVisitor<T>
+public interface IVisitor<T>
 {
     T Visit(VariableDeclarationNode node);
     T Visit(LiteralNode node);

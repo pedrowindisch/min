@@ -2,7 +2,7 @@ using Min.Compiler;
 using Min.Compiler.Exceptions;
 using Min.Compiler.Nodes;
 
-namespace Min.Tests.Compiler.Parser.Cases;
+namespace Min.Tests.Compiler.ParserTests.Cases;
 
 public class OutputStatementTests
 {
@@ -16,7 +16,7 @@ public class OutputStatementTests
             new Token(3, 0, TokenType.EOF)
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
         Assert.Equivalent(new List<Node>()
         {
             new OutputStatementNode(tokens[0], [new LiteralNode(tokens[1])])
@@ -35,7 +35,7 @@ public class OutputStatementTests
             new Token(3, 0, TokenType.EOF)
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
         Assert.Equivalent(new List<Node>()
         {
             new OutputStatementNode(tokens[0], [
@@ -54,7 +54,7 @@ public class OutputStatementTests
             new Token(3, 0, TokenType.EOF)
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
         var exception = Assert.Throws<CompilerException>(parser.Program);
         Assert.Equal(CompilerExceptionType.MissingExpression, exception.Type);
     }
@@ -70,7 +70,7 @@ public class OutputStatementTests
             new Token(1, 0, TokenType.EOF)
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
         var exception = Assert.Throws<CompilerException>(parser.Program);
         Assert.Equal(CompilerExceptionType.MissingValueAfterComma, exception.Type);
     }

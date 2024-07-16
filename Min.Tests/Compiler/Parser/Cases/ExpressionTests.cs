@@ -2,7 +2,7 @@ using Min.Compiler;
 using Min.Compiler.Exceptions;
 using Min.Compiler.Nodes;
 
-namespace Min.Tests.Compiler.Parser.Cases;
+namespace Min.Tests.Compiler.ParserTests.Cases;
 
 public class ExpressionTests
 {
@@ -21,7 +21,7 @@ public class ExpressionTests
             new(1, 3, TokenType.EOF),
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
         var output = parser.Program()[0] as OutputStatementNode;
 
         Assert.Equivalent(new BinaryExpressionNode(
@@ -43,7 +43,7 @@ public class ExpressionTests
             new(1, 3, TokenType.EOF),
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
         var output = parser.Program()[0] as OutputStatementNode;
 
         Assert.Equivalent(new BinaryExpressionNode(
@@ -69,7 +69,7 @@ public class ExpressionTests
             new(1, 0, TokenType.EOF),
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
         var output = parser.Program()[0] as OutputStatementNode;
 
         Assert.Equivalent(new BinaryExpressionNode(
@@ -96,7 +96,7 @@ public class ExpressionTests
             new(1, 0, TokenType.EOF),
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
         var exception = Assert.Throws<CompilerException>(parser.Program);        
     }
 
@@ -117,7 +117,7 @@ public class ExpressionTests
             new(1, 0, TokenType.EOF),
         };
 
-        var parser = new Min.Compiler.Parser(tokens);
+        var parser = new Parser(tokens);
         var exception = Assert.Throws<CompilerException>(parser.Program);
         Assert.Equal(CompilerExceptionType.UnclosedParenthesis, exception.Type);        
     }

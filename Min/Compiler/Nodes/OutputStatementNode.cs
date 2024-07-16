@@ -1,6 +1,6 @@
 namespace Min.Compiler.Nodes;
 
-internal class OutputStatementNode : Node
+public class OutputStatementNode : Node
 {
     public List<Node> Values { get; set; }
 
