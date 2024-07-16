@@ -1,6 +1,6 @@
 namespace Min.Compiler.Exceptions;
 
-internal class CompilerException : Exception
+public class CompilerException : Exception
 {
     public int Line { get; init; }
     public int Column { get; init; }

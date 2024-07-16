@@ -1,6 +1,6 @@
 namespace Min.Compiler.Exceptions;
 
-internal enum CompilerExceptionType
+public enum CompilerExceptionType
 {
     UnexpectedCharacter,
     UnterminatedString,
@@ -27,12 +27,14 @@ internal static class CompilerExceptionTypeExtensions
         {
             CompilerExceptionType.UnexpectedCharacter
                 when args is [char ch] => $"Expected {ch}.",
+            CompilerExceptionType.UnrecognizedOperator
+                when args is [string op] => $"Unrecognized operator: {op}",
+            CompilerExceptionType.UnexpectedCharacter
+                when args is [char ch] => $"Unexpected character: {ch}",
             _ when args is [string message] => message,
             
-            CompilerExceptionType.UnexpectedCharacter => "Unexpected character: {0}",
             CompilerExceptionType.UnterminatedString => "Unterminated string",
             CompilerExceptionType.UnrecognizedKeyword => "Unrecognized keyword",
-            CompilerExceptionType.UnrecognizedOperator => "Unrecognized operator: {0}",
             CompilerExceptionType.UnexpectedEOF => "Unexpected end of file.",
             CompilerExceptionType.InvalidIdentifier => "Invalid identifier.",
             CompilerExceptionType.InvalidNumberLiteral => "Malformed number.",

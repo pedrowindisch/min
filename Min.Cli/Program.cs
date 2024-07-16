@@ -6,7 +6,7 @@ var fileArgument = new Argument<FileInfo>(
     description: "source code file"
 );
 
-var rootCommand = new RootCommand("min compiler cli");
+var rootCommand = new RootCommand("Min compiler - CLI");
 rootCommand.AddArgument(fileArgument);
 
 rootCommand.SetHandler(CommandHandlers.CompileCommandHandler, fileArgument);
