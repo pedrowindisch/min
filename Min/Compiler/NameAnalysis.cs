@@ -1,18 +1,21 @@
-using Min.Compiler.CodeGeneration;
 using Min.Compiler.Exceptions;
 using Min.Compiler.Nodes;
 
 namespace Min.Compiler;
 
-internal class NameAnalysis(SymbolTable symbols, List<Node> tree)
-    : SemanticStep<bool>(symbols, tree), IVisitor<bool>
+internal sealed class NameAnalysis
+    : ISemanticAnalysisStep, IVisitor<bool>
 {
-    public override bool Execute()
+    private SymbolTable _symbols = null!;
+
+    public (SymbolTable, List<Node>) Execute(SymbolTable symbols, List<Node> nodes)
     {
-        foreach (var node in _nodes)
+        _symbols = symbols;
+
+        foreach (var node in nodes)
             node.Accept(this);
 
-        return true;
+        return (symbols, nodes);
     }
 
     public bool Visit(VariableDeclarationNode node)
