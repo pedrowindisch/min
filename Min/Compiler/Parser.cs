@@ -14,11 +14,35 @@ internal class Parser
     }
 
     private Token Peek(int positions = 0) => Tokens.ElementAtOrDefault(_current + positions) ?? Tokens.Last();
+    private void Advance() => _current++;
 
-    public bool Match(TokenType type) => Peek().Type == type;
-    public bool Match(params TokenType[] types) => types.Contains(Peek().Type);
+    private bool Match(TokenType[] types) 
+    {
+        var matched = types.Contains(Peek().Type);
+        if (matched) Advance();
 
-    public void Advance() => _current++;
+        return matched;
+    }
+
+    private bool Match(TokenType type)
+    {
+        var matched = Peek().Type == type;
+        if (matched) Advance();
+
+        return matched;
+    }
+
+    private bool Match(TokenType type, out Token? token)
+    {
+        token = Peek();
+        return Match(type);
+    }
+
+    private bool Match(TokenType[] types, out Token? token) 
+    {
+        token = Peek();
+        return Match(types);
+    }
 
     public List<Node> Program()
     {
@@ -58,26 +82,20 @@ internal class Parser
 
     private Node InputStatement()
     {
-        var start = Peek();
-        Advance();
+        Match(TokenType.Input, out var start);
 
-        if (!Match(TokenType.Identifier))
+        if (!Match(TokenType.Identifier, out var identifier))
             throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.ExpectedKeyword, "a variable/identifier");
 
-        var identifier = Peek();
-        Advance();
-
-        return new InputStatementNode(start, new VariableNode(identifier));
+        return new InputStatementNode(start!, new VariableNode(identifier!));
     }
 
     private Node OutputStatement()
     {
-        var start = Peek();
-        Advance();
-
+        Match(TokenType.Output, out var start);
         var values = CommaSeparatedExpressions();
 
-        return new OutputStatementNode(start, values);
+        return new OutputStatementNode(start!, values);
     }
 
     private List<Node> CommaSeparatedExpressions()
@@ -86,8 +104,6 @@ internal class Parser
 
         while (Match(TokenType.Comma))
         {
-            Advance();
-            
             try
             {
                 expressions.Add(Expression());
@@ -103,20 +119,14 @@ internal class Parser
 
     private VariableDeclarationNode VariableDeclaration()
     {
-        var identifier = Peek();
-        Advance();
+        Match(TokenType.Identifier, out var identifier);
 
-        if (!Match(TokenType.Int, TokenType.Float, TokenType.String, TokenType.Bool))
+        if (!Match([TokenType.Int, TokenType.Float, TokenType.String, TokenType.Bool], out var type))
             throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidVariableDeclaration, "The provided variable type is invalid. Allowed values are: int, float, string, or bool.");
 
-        var type = Peek().Type;
-        Advance();
-
         if (!Match(TokenType.Assign))
-            return new VariableDeclarationNode(identifier, type, identifier.Lexeme!);
+            return new VariableDeclarationNode(identifier!, type!.Type, identifier!.Lexeme!);
 
-        Advance();
-        
         Node value;
         try
         {
@@ -127,14 +137,13 @@ internal class Parser
             throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidVariableDeclaration, "To initialize a variable, you must provide either a number, string or an identifier.");
         }
 
-        return new VariableDeclarationNode(identifier, type, identifier.Lexeme!, value);
+        return new VariableDeclarationNode(identifier!, type!.Type, identifier!.Lexeme!, value);
     }
 
     private AssignmentStatementNode AssignmentStatement()
     {
-        var identifier = Peek();
-        Advance();
-        Advance(); // =
+        Match(TokenType.Identifier, out var identifier);
+        Match(TokenType.Assign);
 
         Node value;
         try
@@ -146,13 +155,12 @@ internal class Parser
             throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidAssignmentValue, "Invalid value.");
         }
 
-        return new AssignmentStatementNode(identifier, value);
+        return new AssignmentStatementNode(identifier!, value);
     }
 
     private IfStatementNode IfStatement()
     {
-        var start = Peek();
-        Advance();
+        Match(TokenType.If, out var start);
 
         Node condition;
         try 
@@ -167,10 +175,8 @@ internal class Parser
         if (!Match(TokenType.Colon))
             throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedCharacter, "The condition of an if statement must be followed by a colon.");
 
-        Advance();
-
         List<Node> block = [];
-        while (!Match(TokenType.EndIf, TokenType.Else))
+        while (!Match([TokenType.EndIf, TokenType.Else]))
         {
             try
             {
@@ -186,8 +192,8 @@ internal class Parser
         // if (Match(TokenType.Else))
         //     elseNode = ElseStatement();
 
-        Advance(); // endif
-        return new IfStatementNode(start, condition, block);
+        Match(TokenType.EndIf); // endif
+        return new IfStatementNode(start!, condition, block);
     }
 
     // private void ElseIfStatement()
@@ -216,13 +222,10 @@ internal class Parser
     private Node Comparison()
     {
         var left = Additive();
-        while (Match(TokenType.GreaterThan, TokenType.GreaterThanOrEqual, TokenType.LessThan, TokenType.LessThanOrEqual, TokenType.EqualsTo, TokenType.NotEqualsTo))
+        while (Match([TokenType.GreaterThan, TokenType.GreaterThanOrEqual, TokenType.LessThan, TokenType.LessThanOrEqual, TokenType.EqualsTo, TokenType.NotEqualsTo], out var op))
         {
-            var op = Peek();
-            Advance();
-
             var right = Expression();
-            return new BinaryExpressionNode(left, op.Type, right);
+            return new BinaryExpressionNode(left, op!.Type, right);
         }
 
         return left;
@@ -231,13 +234,10 @@ internal class Parser
     private Node Additive()
     {
         var left = Multiplicative();
-        while (Match(TokenType.Subtract, TokenType.Add))
+        while (Match([TokenType.Subtract, TokenType.Add], out var op))
         {
-            var op = Peek();
-            Advance();
-
             var right = Expression();
-            return new BinaryExpressionNode(left, op.Type, right);
+            return new BinaryExpressionNode(left, op!.Type, right);
         }
 
         return left;
@@ -246,13 +246,10 @@ internal class Parser
     private Node Multiplicative()
     {
         var left = Primary();
-        while (Match(TokenType.Multiply, TokenType.Divide))
+        while (Match([TokenType.Multiply, TokenType.Divide], out var op))
         {
-            var op = Peek();
-            Advance();
-
             var right = Expression();
-            return new BinaryExpressionNode(left, op.Type, right);
+            return new BinaryExpressionNode(left, op!.Type, right);
         }
 
         return left;
@@ -260,28 +257,14 @@ internal class Parser
 
     private Node Primary()
     {
-        if (Match(TokenType.NumberLiteral, TokenType.StringLiteral, TokenType.True, TokenType.False))
+        if (Match([TokenType.NumberLiteral, TokenType.StringLiteral, TokenType.True, TokenType.False], out var op))
+            return new LiteralNode(op!);
+
+        if (Match(TokenType.Identifier, out var identifier))
+            return new VariableNode(identifier!);
+
+        if (Match(TokenType.LeftParenthesis, out var start))
         {
-            var token = Peek();
-            Advance();
-
-            return new LiteralNode(token);
-        }
-
-        if (Match(TokenType.Identifier))
-        {
-            var token = Peek();
-            Advance();
-
-            return new VariableNode(token);
-        }
-
-        // @todo punctuation are not implemented in the tokenizer...
-        if (Match(TokenType.LeftParenthesis))
-        {
-            var start = Peek();
-
-            Advance();
             Node expr;
             try
             {
@@ -293,9 +276,8 @@ internal class Parser
             }
             
             if (!Match(TokenType.RightParenthesis))
-                throw new CompilerException(start.Line, start.Column, CompilerExceptionType.UnclosedParenthesis, Peek());
+                throw new CompilerException(start!.Line, start.Column, CompilerExceptionType.UnclosedParenthesis, Peek());
 
-            Advance();
             return new GroupingNode(expr);
         }
 

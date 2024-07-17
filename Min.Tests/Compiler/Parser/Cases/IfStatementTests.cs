@@ -43,9 +43,6 @@ public class IfStatementTests
     [Fact]
     public void Parse_SingleBranchIfStatementWithExpressionCondition_ReturnsTree()
     {
-        // if true:
-        //     output "min"
-        // endif
         var tokens = new List<Token>()
         {
             new Token(1, 0, TokenType.If),
