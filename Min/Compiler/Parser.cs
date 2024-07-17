@@ -162,7 +162,7 @@ internal class Parser
         }
         catch (CompilerException)
         {
-            throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidVariableDeclaration, "To intiialize a variable, you must provide either a number, string or an identifier.");
+            throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidVariableDeclaration, "To initialize a variable, you must provide either a number, string or an identifier.");
         }
 
         return new VariableDeclarationNode(identifier, type, identifier.Lexeme!, value);

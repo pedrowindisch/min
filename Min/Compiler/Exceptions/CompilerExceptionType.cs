@@ -21,6 +21,10 @@ public enum CompilerExceptionType
     MissingExpression,
     InvalidAssignmentValue,
     UnexpectedToken,
+
+    IdentifierAlreadyDeclared,
+    IdentifierNotDeclared,
+    IncompatibleType,
 }
 
 internal static class CompilerExceptionTypeExtensions
@@ -34,6 +38,10 @@ internal static class CompilerExceptionTypeExtensions
                 when args is [string op] => $"Unrecognized operator: {op}",
             CompilerExceptionType.UnexpectedCharacter
                 when args is [char] or [string] => $"Unexpected character: {args[0]}",
+            CompilerExceptionType.IncompatibleType 
+                when args is [string message] => $"This value is incompatible with the expected type: {message}",
+
+
             _ when args is [string message] => message,
             
             CompilerExceptionType.UnterminatedString => "Unterminated string",
@@ -46,6 +54,10 @@ internal static class CompilerExceptionTypeExtensions
             CompilerExceptionType.MissingValueAfterComma => "Missing value after comma.",
             CompilerExceptionType.MissingExpression => "Missing expression.",
 
+            CompilerExceptionType.IdentifierNotDeclared => $"Identifier has not been declared yet.",
+            CompilerExceptionType.IdentifierAlreadyDeclared => $"Identifier has already been declared.",
+            CompilerExceptionType.IncompatibleType => "This value is incompatible with the expected type.",
+            
             _ => throw new Exception("Exception type with given arguments (or no arguments) does not have a message."),
         }, args);
 }

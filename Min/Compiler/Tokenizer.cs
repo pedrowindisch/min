@@ -32,7 +32,9 @@ internal class Tokenizer : IEnumerable<Token>
         { "out", TokenType.Output },
         { "if", TokenType.If },
         { "else", TokenType.Else },
-        { "endif", TokenType.EndIf }
+        { "endif", TokenType.EndIf },
+        { "true", TokenType.True },
+        { "false", TokenType.False }
     };
 
     private string _source;

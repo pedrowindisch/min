@@ -1,10 +1,20 @@
 using System.Text;
+using Min.Compiler.Exceptions;
 using Min.Compiler.Nodes;
 
-namespace Min.Compiler.CodeGeneration.Cil;
+namespace Min.Compiler.CodeGeneration;
 
 public class CilGenerator : ICodeGenerator, IVisitor<string>
 {
+    private readonly SymbolTable _symbols;
+    private readonly TypeChecker _typeChecker;
+
+    public CilGenerator()
+    {
+        _symbols = new();
+        _typeChecker = new(_symbols);
+    }
+
     public string Generate(List<Node> nodes)
     {
         var code = new StringBuilder();
@@ -17,26 +27,43 @@ public class CilGenerator : ICodeGenerator, IVisitor<string>
 
     public string Visit(VariableDeclarationNode node)
     {
+        try
+        {
+            _symbols.Add(node.Name, node.VariableType);
+        }
+        catch (InternalCompilerException ex) when (ex.Type is CompilerExceptionType.IdentifierAlreadyDeclared)
+        {
+            throw new CompilerException(node.Start.Line, node.Start.Column, CompilerExceptionType.IdentifierAlreadyDeclared, node.Name);
+        }
+
         var value = node.Value is not null ? node.Value.Accept(this) : "";
+        if (node.Value is not null && !_typeChecker.Check(node.Value, node.VariableType))
+            throw new CompilerException(node.Value.Start.Line, node.Value.Start.Column, CompilerExceptionType.IncompatibleType, $"{node.Name} expects a {node.VariableType}.");
+
         return $"{node.Name} {{ {value} }}";
     }
 
     public string Visit(LiteralNode node) =>
         node.Start.Type switch
         {
-            TokenType.NumberLiteral => $"number {node.Value}",
-            TokenType.StringLiteral => $"string \"{node.Value}\"",
-            TokenType.True or TokenType.False => $"bool {node.Value}",
+            TokenType.NumberLiteral => $"number {node.Token.Lexeme}",
+            TokenType.StringLiteral => $"string \"{node.Token.Lexeme}\"",
+            TokenType.True or TokenType.False => $"bool {node.Token.Lexeme}",
             _ => throw new Exception()
         };
 
     public string Visit(BinaryExpressionNode node)
     {
-        return $"{node.Operator} {{ {node.Left}, {node.Right} }}";
+        var message = $"{node.Operator} {{ {node.Left.Accept(this)}, {node.Right.Accept(this)} }}";
+
+        return message;
     }
 
     public string Visit(VariableNode node)
     {
+        if (!_symbols.IsSaved(node.Name))
+            throw new CompilerException(node.Start.Line, node.Start.Column, CompilerExceptionType.IdentifierNotDeclared, node.Name);
+
         return node.Name;
     }
 

@@ -1,4 +1,4 @@
-using Min.Compiler.CodeGeneration.Cil;
+using Min.Compiler.CodeGeneration;
 using Min.Compiler.Exceptions;
 using Spectre.Console;
 
@@ -16,8 +16,7 @@ internal class CommandHandlers
         try
         {
             compiler.Compile(new(
-                Path.ChangeExtension(fileInfo.FullName, ".comp"),
-                new CilGenerator()
+                Path.ChangeExtension(fileInfo.FullName, ".comp")
             ));
         }
         catch (CompilerException ex)

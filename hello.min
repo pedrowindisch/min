@@ -1,9 +1,5 @@
-.nome string
-in .nome
+.nome string = "alice"
 
-if .nome == "pedro"::
-    output .nome, " comneça com p"
-    output "deseja continuar?"
-    .desejaContinuar bool
-    in .desejaContinuar
+if 123 == "123":
+    output true
 endif
