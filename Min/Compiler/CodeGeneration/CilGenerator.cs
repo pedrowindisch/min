@@ -37,8 +37,6 @@ public class CilGenerator : ICodeGenerator, IVisitor<string>
         }
 
         var value = node.Value is not null ? node.Value.Accept(this) : "";
-        if (node.Value is not null && !_typeChecker.Check(node.Value, node.VariableType))
-            throw new CompilerException(node.Value.Start.Line, node.Value.Start.Column, CompilerExceptionType.IncompatibleType, $"{node.Name} expects a {node.VariableType}.");
 
         return $"{node.Name} {{ {value} }}";
     }

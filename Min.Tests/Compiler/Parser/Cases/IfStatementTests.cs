@@ -39,6 +39,46 @@ public class IfStatementTests
         }, parser.Program());
     }
 
+    
+    [Fact]
+    public void Parse_SingleBranchIfStatementWithExpressionCondition_ReturnsTree()
+    {
+        // if true:
+        //     output "min"
+        // endif
+        var tokens = new List<Token>()
+        {
+            new Token(1, 0, TokenType.If),
+            new Token(1, 0, TokenType.NumberLiteral, "1"),
+            new Token(1, 0, TokenType.Add),
+            new Token(1, 0, TokenType.NumberLiteral, "2"),
+            new Token(1, 0, TokenType.EqualsTo),
+            new Token(1, 0, TokenType.NumberLiteral, "3"),
+            new Token(1, 0, TokenType.Colon),
+            new Token(2, 0, TokenType.Output),
+            new Token(2, 0, TokenType.StringLiteral, "min"),
+            new Token(3, 0, TokenType.EndIf),
+            new Token(3, 0, TokenType.EOF)
+        };
+
+        var parser = new Parser(tokens);
+        Assert.Equivalent(new List<Node>()
+        {
+            new IfStatementNode(
+                tokens[0], 
+                [new BinaryExpressionNode(
+                    new BinaryExpressionNode(
+                        new LiteralNode(tokens[1]),
+                        TokenType.Add,
+                        new LiteralNode(tokens[3])
+                    ),
+                    TokenType.EqualsTo,
+                    new LiteralNode(tokens[5])
+                )]
+            )
+        }, parser.Program());
+    }
+
     [Fact]
     public void Parse_UnfinishedSingleBranchIfStatement_ThrowsException()
     {

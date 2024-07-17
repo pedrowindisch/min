@@ -1,5 +1,0 @@
-.nome string = "alice"
-
-if 123 == "123":
-    output true
-endif

@@ -68,7 +68,7 @@ internal class Tokenizer : IEnumerable<Token>
                 '<' or '>' or '=' or '!' or '+' or '-' or '*' or '/' => MatchOperator(),
                 char when char.IsNumber(currentChar) => MatchNumber(),
                 '"' => MatchString(),
-                ',' or ':' => MatchPunctuation(),
+                ',' or ':' or '(' or ')' => MatchPunctuation(),
 
                 _ => throw new CompilerException(_currentLine, _currentColumn, CompilerExceptionType.UnexpectedCharacter, currentChar)
             };
@@ -88,6 +88,8 @@ internal class Tokenizer : IEnumerable<Token>
             {
                 ',' => TokenType.Comma,
                 ':' => TokenType.Colon,
+                '(' => TokenType.LeftParenthesis,
+                ')' => TokenType.RightParenthesis,
 
                 _ => throw new Exception("should not be called")
             });     
