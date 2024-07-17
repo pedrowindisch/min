@@ -7,7 +7,7 @@ public class NumberLiteralTests
 {
     [Theory]
     [InlineData("123")]
-    [InlineData("123.3")]
+    [InlineData("12.3")]
     public void Tokenize_NumberLiterals_ReturnsTokensList(string numberLiteral)
     {
         var tokenizer = new Tokenizer(numberLiteral);
@@ -15,6 +15,21 @@ public class NumberLiteralTests
         Assert.Equivalent(new List<Token>
         {
             new Token(1, 0, TokenType.NumberLiteral, numberLiteral),
+            new Token(1, numberLiteral.Length, TokenType.EOF)
+        }, tokenizer.ToList());
+    } 
+    
+    [Theory]
+    [InlineData("-123")]
+    [InlineData("-12.3")]
+    public void Tokenize_NegativeNumberLiterals_ReturnsTokensList(string numberLiteral)
+    {
+        var tokenizer = new Tokenizer(numberLiteral);
+
+        Assert.Equivalent(new List<Token>
+        {
+            new Token(1, 0, TokenType.Subtract),
+            new Token(1, 1, TokenType.NumberLiteral, numberLiteral[1..]),
             new Token(1, numberLiteral.Length, TokenType.EOF)
         }, tokenizer.ToList());
     } 

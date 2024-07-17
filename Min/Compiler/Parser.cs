@@ -281,6 +281,9 @@ internal class Parser
             return new GroupingNode(expr);
         }
 
+        if (Match([TokenType.Subtract], out var token))
+            return new UnaryExpressionNode(token!, token!.Type, Expression());
+
         throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.MissingExpression, "Missing expression.");
     }
 }

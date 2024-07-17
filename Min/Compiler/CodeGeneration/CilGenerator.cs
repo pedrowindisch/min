@@ -89,4 +89,9 @@ public class CilGenerator : ICodeGenerator, IVisitor<string>
     {
         return $"if ({node.Condition!.Accept(this)}) {{ {string.Join(", ", node.Block.Select(n => n.Accept(this)))} }}";
     }
+
+    public string Visit(UnaryExpressionNode node)
+    {
+        throw new NotImplementedException();
+    }
 }
