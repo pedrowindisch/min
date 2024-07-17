@@ -23,6 +23,7 @@ public class Min(string sourceCode)
 
         var semanticPipeline = new SemanticAnalysisPipeline(symbolTable, nodes);
         semanticPipeline.AddStep<NameAnalysis>();
+        semanticPipeline.AddStep<TypeChecker>();
 
         var (Symbols, Nodes) = semanticPipeline.Execute();
 

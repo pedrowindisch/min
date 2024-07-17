@@ -7,6 +7,8 @@ namespace Min.Compiler.CodeGeneration;
 public class CilGenerator(SymbolTable symbols, List<Node> nodes) 
     : BaseCodeGenerator(symbols, nodes), IVisitor<string>
 {
+    
+
     public override string Execute()
     {
         var code = new StringBuilder();
