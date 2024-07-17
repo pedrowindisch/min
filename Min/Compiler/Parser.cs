@@ -56,44 +56,6 @@ internal class Parser
             _ => throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedToken, "Expected a statement.")
         };
 
-        // var startToken = Peek();
-        // var type = startToken.Type;
-
-        // if (type is TokenType.Identifier)
-        // {
-        //     Advance();
-
-        //     if (!Match(TokenType.Colon))
-        //         throw new CompilerException(startToken.Line, startToken.Column, CompilerExceptionType.InvalidVariableDeclaration, "Variable declarations must specify their types.");
-
-        //     Advance();
-        //     if (!Match(TokenType.Int, TokenType.Float, TokenType.String, TokenType.Bool))
-        //         throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidVariableDeclaration, "The provided variable type is invalid. Allowed values are: int, float, string, or bool.");
-
-        //     var variableType = Peek().Type;
-        //     Advance();
-            
-        //     if (!Match(TokenType.Assign))
-        //         return new VariableDeclarationNode(startToken, variableType, startToken.Lexeme!);
-            
-        //     Advance();
-        //     Node value;
-        //     try
-        //     {
-        //         value = Expression();
-        //     }
-        //     catch (CompilerException)
-        //     {
-        //         throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidVariableDeclaration, "To intiialize a variable, you must provide either a number, string or an identifier.");
-        //     }
-
-        //     return new VariableDeclarationNode(startToken, variableType, startToken.Lexeme!, value);
-        // }
-
-        // throw new NotImplementedException();
-
-
-
     private Node InputStatement()
     {
         var start = Peek();
