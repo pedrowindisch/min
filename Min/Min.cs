@@ -1,4 +1,3 @@
-using System.Text;
 using Min.Compiler;
 using Min.Compiler.CodeGeneration;
 
@@ -20,7 +19,13 @@ public class Min(string sourceCode)
 
         var tokenizer = new Tokenizer(_sourceCode).ToList();
         var tree = new Parser(tokenizer).Program();
-        var output = new CilGenerator().Generate(tree);
+        var symbolTable = new SymbolTable();
+
+        new NameAnalysis(symbolTable, tree).Execute();
+
+        // Study how to allow the user to extend the generator classes.
+        BaseCodeGenerator generator = new CilGenerator(symbolTable, tree);
+        var output = generator.Execute();
 
         File.WriteAllText(options.OutputFilePath, output);
     }

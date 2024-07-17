@@ -40,6 +40,10 @@ internal static class CompilerExceptionTypeExtensions
                 when args is [char] or [string] => $"Unexpected character: {args[0]}",
             CompilerExceptionType.IncompatibleType 
                 when args is [string message] => $"This value is incompatible with the expected type: {message}",
+            CompilerExceptionType.IdentifierNotDeclared
+                when args is [string identifier] => $"{identifier} has not been declared yet.",
+            CompilerExceptionType.IdentifierAlreadyDeclared
+                when args is [string identifier] => $"{identifier} has already been declared.",
 
 
             _ when args is [string message] => message,

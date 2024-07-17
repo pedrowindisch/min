@@ -1,6 +1,6 @@
 using Min.Compiler.Exceptions;
 
-namespace Min.Compiler.CodeGeneration;
+namespace Min.Compiler;
 
 public class SymbolTable
 {

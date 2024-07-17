@@ -4,22 +4,14 @@ using Min.Compiler.Nodes;
 
 namespace Min.Compiler.CodeGeneration;
 
-public class CilGenerator : ICodeGenerator, IVisitor<string>
+public class CilGenerator(SymbolTable symbols, List<Node> nodes) 
+    : BaseCodeGenerator(symbols, nodes), IVisitor<string>
 {
-    private readonly SymbolTable _symbols;
-    private readonly TypeChecker _typeChecker;
-
-    public CilGenerator()
-    {
-        _symbols = new();
-        _typeChecker = new(_symbols);
-    }
-
-    public string Generate(List<Node> nodes)
+    public override string Execute()
     {
         var code = new StringBuilder();
 
-        foreach (var node in nodes)
+        foreach (var node in _nodes)
             code.AppendLine(node.Accept(this));
 
         return code.ToString();        
@@ -27,15 +19,6 @@ public class CilGenerator : ICodeGenerator, IVisitor<string>
 
     public string Visit(VariableDeclarationNode node)
     {
-        try
-        {
-            _symbols.Add(node.Name, node.VariableType);
-        }
-        catch (InternalCompilerException ex) when (ex.Type is CompilerExceptionType.IdentifierAlreadyDeclared)
-        {
-            throw new CompilerException(node.Start.Line, node.Start.Column, CompilerExceptionType.IdentifierAlreadyDeclared, node.Name);
-        }
-
         var value = node.Value is not null ? node.Value.Accept(this) : "";
 
         return $"{node.Name} {{ {value} }}";
@@ -59,9 +42,6 @@ public class CilGenerator : ICodeGenerator, IVisitor<string>
 
     public string Visit(VariableNode node)
     {
-        if (!_symbols.IsSaved(node.Name))
-            throw new CompilerException(node.Start.Line, node.Start.Column, CompilerExceptionType.IdentifierNotDeclared, node.Name);
-
         return node.Name;
     }
 
