@@ -1,5 +1,3 @@
 namespace Min;
 
-public record CompilerOptions(
-    string OutputFilePath
-);
+public record CompilerOptions();

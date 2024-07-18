@@ -5,14 +5,9 @@ using Spectre.Console;
 
 namespace Min.Cli;
 
-internal class CompilerExceptionFormatter
+internal class CompilerExceptionFormatter(string sourceCode)
 {
-    private string[] Lines { get; init; }
-
-    public CompilerExceptionFormatter(string sourceCode)
-    {
-        Lines = sourceCode.Split("\n");
-    }
+    private string[] Lines { get; init; } = sourceCode.Split("\n");
 
     private (int, string) GetLine(int line) => (line, Lines.ElementAt(line - 1)); // Lines are not zero-indexed during the tokenization.
     public Markup GenerateErrorReport(CompilerException exception)

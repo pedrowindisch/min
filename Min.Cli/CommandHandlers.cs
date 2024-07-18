@@ -1,4 +1,3 @@
-using Min.Compiler.CodeGeneration;
 using Min.Compiler.Exceptions;
 using Spectre.Console;
 
@@ -6,7 +5,7 @@ namespace Min.Cli;
 
 internal class CommandHandlers
 {
-    public static void CompileCommandHandler(FileInfo fileInfo)
+    public static void CompileCommandHandler(FileInfo fileInfo, bool overwrite)
     {
         if (!File.Exists(fileInfo.FullName))
             throw new ArgumentException("The provided file does not exist.");
@@ -15,9 +14,10 @@ internal class CommandHandlers
         var compiler = new Min(sourceCode);
         try
         {
-            compiler.Compile(new(
-                Path.ChangeExtension(fileInfo.FullName, ".comp")
-            ));
+            var result = compiler.Compile();
+
+            var outputFile = Path.ChangeExtension(fileInfo.FullName, "comp");
+            File.WriteAllText(outputFile, result);
         }
         catch (CompilerException ex)
         {
