@@ -5,7 +5,7 @@ namespace Min.Compiler;
 
 public class ConstantFoldingStep : ISemanticAnalysisStep
 {
-    public (SymbolTable, List<Node>) Execute(SymbolTable symbolTable, List<Node> nodes)
+    public (SymbolTable, ProgramNode) Execute(SymbolTable symbolTable, ProgramNode nodes)
     {
         throw new NotImplementedException();
     }
