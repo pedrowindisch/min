@@ -1,17 +1,18 @@
-using Min.Compiler.Nodes;
+using Min.Compiler.Nodes2;
 
 namespace Min.Compiler;
 
-public interface IVisitor<T>
+public interface IVisitor
 {
-    T Visit(VariableDeclarationNode node);
-    T Visit(LiteralNode node);
-    T Visit(BinaryExpressionNode node);
-    T Visit(UnaryExpressionNode node);
-    T Visit(VariableNode node);
-    T Visit(GroupingNode node);
-    T Visit(AssignmentStatementNode node);
-    T Visit(InputStatementNode node);
-    T Visit(OutputStatementNode node);
-    T Visit(IfStatementNode node);
+    void Visit(ProgramNode node);
+    void Visit(VariableDeclarationNode node);
+    void Visit(VariableAssignmentnNode node);
+    void Visit(ComparisonExpressionNode node);
+    void Visit(MultiplicativeExpressionNode node);
+    void Visit(AdditiveExpressionNode node);
+    void Visit(UnaryExpressionNode node);
+    void Visit(NumberExpressionNode node);
+    void Visit(BooleanExpressionNode node);
+    void Visit(IdentifierExpressionNode node);
+    void Visit(GroupingExpressionNode node);
 }

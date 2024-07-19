@@ -1,5 +1,5 @@
 using Min.Compiler.Exceptions;
-using Min.Compiler.Nodes;
+using Min.Compiler.Nodes2;
 
 namespace Min.Compiler;
 
@@ -44,23 +44,23 @@ internal class Parser
         return Match(types);
     }
 
-    public List<Node> Program()
+    public ProgramNode Program()
     {
         var statements = Statements();
 
-        return statements;
+        return new ProgramNode(statements);
     }
 
-    private List<Node> Statements()
+    private List<StatementNode> Statements()
     {
-        var statements = new List<Node>();
+        var statements = new List<StatementNode>();
         while (!Match(TokenType.EOF))
             statements.Add(Statement());
 
         return statements;
     }
 
-    private Node Statement() =>
+    private StatementNode Statement() =>
         Peek().Type switch
         {
             TokenType.Identifier when Peek(1).Type is TokenType.String or TokenType.Int or TokenType.Bool or TokenType.Float => VariableDeclaration(),
@@ -80,27 +80,33 @@ internal class Parser
             _ => throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedToken, "Expected a statement.")
         };
 
-    private Node InputStatement()
+    private InputStatementNode InputStatement()
     {
         Match(TokenType.Input, out var start);
 
         if (!Match(TokenType.Identifier, out var identifier))
             throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.ExpectedKeyword, "a variable/identifier");
 
-        return new InputStatementNode(start!, new VariableNode(identifier!));
+        return new InputStatementNode(
+            Position.From(start!), 
+            identifier.Lexeme
+        );
     }
 
-    private Node OutputStatement()
+    private OutputStatementNode OutputStatement()
     {
         Match(TokenType.Output, out var start);
         var values = CommaSeparatedExpressions();
 
-        return new OutputStatementNode(start!, values);
+        return new OutputStatementNode(
+            Position.From(start!), 
+            values
+        );
     }
 
-    private List<Node> CommaSeparatedExpressions()
+    private List<ExpressionNode> CommaSeparatedExpressions()
     {
-        List<Node> expressions = [Expression()];
+        List<ExpressionNode> expressions = [Expression()];
 
         while (Match(TokenType.Comma))
         {
@@ -125,44 +131,55 @@ internal class Parser
             throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidVariableDeclaration, "The provided variable type is invalid. Allowed values are: int, float, string, or bool.");
 
         if (!Match(TokenType.Assign))
-            return new VariableDeclarationNode(identifier!, type!.Type, identifier!.Lexeme!);
+            return new VariableDeclarationNode(
+                Position.From(identifier!),
+                identifier.Lexeme, 
+                BuiltInTypeHelpers.From(type.Type)
+            );
 
-        Node value;
         try
         {
-            value = Expression();
+            var value = Expression();
+            return new VariableDeclarationNode(
+                Position.From(identifier!),
+                identifier.Lexeme,
+                BuiltInTypeHelpers.From(type.Type), 
+                value
+            );
         }
         catch (CompilerException)
         {
             throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidVariableDeclaration, "To initialize a variable, you must provide either a number, string or an identifier.");
         }
 
-        return new VariableDeclarationNode(identifier!, type!.Type, identifier!.Lexeme!, value);
     }
 
-    private AssignmentStatementNode AssignmentStatement()
+    private VariableAssignmentnNode AssignmentStatement()
     {
         Match(TokenType.Identifier, out var identifier);
         Match(TokenType.Assign);
 
-        Node value;
         try
         {
-            value = Expression();
+            ExpressionNode value = Expression();
+            return new VariableAssignmentnNode(
+                Position.From(identifier!), 
+                identifier.Lexeme,
+                value
+            );
         }
         catch (CompilerException)
         {
             throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.InvalidAssignmentValue, "Invalid value.");
         }
 
-        return new AssignmentStatementNode(identifier!, value);
     }
 
     private IfStatementNode IfStatement()
     {
         Match(TokenType.If, out var start);
 
-        Node condition;
+        ExpressionNode condition;
         try 
         {
             condition = Expression();
@@ -175,7 +192,7 @@ internal class Parser
         if (!Match(TokenType.Colon))
             throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedCharacter, "The condition of an if statement must be followed by a colon.");
 
-        List<Node> block = [];
+        List<StatementNode> block = [];
         while (!Match([TokenType.EndIf, TokenType.Else]))
         {
             try
@@ -188,84 +205,87 @@ internal class Parser
             }
         }
 
-        // IfStatementNode? elseNode = null;
-        // if (Match(TokenType.Else))
-        //     elseNode = ElseStatement();
-
         Match(TokenType.EndIf); // endif
-        return new IfStatementNode(start!, condition, block);
+        return new IfStatementNode(
+            Position.From(start!), 
+            condition, 
+            block
+        );
     }
 
-    // private void ElseIfStatement()
-    // {
-
-    // }
-
-    // private IfStatementNode ElseStatement()
-    // {
-    //     if (!Match(TokenType.Else))
-    //         throw new Exception("internal error -- shouldnt be called...");
-
-    //     if (Match())
-    // }
-
-    private Node Expression()
+    private ExpressionNode Expression()
     {
         return Comparison();
     }
 
-    // private void ComparisonOperator()
-    // {
-
-    // }
-
-    private Node Comparison()
+    private ExpressionNode Comparison()
     {
         var left = Additive();
         while (Match([TokenType.GreaterThan, TokenType.GreaterThanOrEqual, TokenType.LessThan, TokenType.LessThanOrEqual, TokenType.EqualsTo, TokenType.NotEqualsTo], out var op))
         {
             var right = Expression();
-            return new BinaryExpressionNode(left, op!.Type, right);
+            return new ComparisonExpressionNode(
+                left.Start,
+                left, 
+                (BuiltInOperator) op!.Type, 
+                right
+            );
         }
 
         return left;
     }
 
-    private Node Additive()
+    private ExpressionNode Additive()
     {
         var left = Multiplicative();
         while (Match([TokenType.Subtract, TokenType.Add], out var op))
         {
             var right = Expression();
-            return new BinaryExpressionNode(left, op!.Type, right);
+            return new AdditiveExpressionNode(
+                left.Start,
+                left, 
+                (BuiltInOperator) op!.Type, 
+                right
+            );
         }
 
         return left;
     }
 
-    private Node Multiplicative()
+    private ExpressionNode Multiplicative()
     {
         var left = Primary();
         while (Match([TokenType.Multiply, TokenType.Divide], out var op))
         {
             var right = Expression();
-            return new BinaryExpressionNode(left, op!.Type, right);
+            return new MultiplicativeExpressionNode(
+                left.Start,
+                left, 
+                (BuiltInOperator) op!.Type, 
+                right
+            );
         }
 
         return left;
     }
 
-    private Node Primary()
+    private ExpressionNode Primary()
     {
-        if (Match([TokenType.NumberLiteral, TokenType.StringLiteral, TokenType.True, TokenType.False], out var op))
-            return new LiteralNode(op!);
+        if (Match(TokenType.NumberLiteral, out var numericToken))
+            return new NumberExpressionNode(Position.From(numericToken!), double.Parse(numericToken.Lexeme));
+
+        
+        if (Match([TokenType.True, TokenType.False], out var boolToken))
+            return new BooleanExpressionNode(Position.From(boolToken!), bool.Parse(boolToken.Lexeme));
 
         if (Match(TokenType.Identifier, out var identifier))
-            return new VariableNode(identifier!);
+            return new IdentifierExpressionNode(Position.From(identifier!), identifier.Lexeme);
+
+        // @todo match string as well later
 
         if (Match(TokenType.LeftParenthesis, out var start))
         {
-            Node expr;
+            ExpressionNode expr;
             try
             {
                 expr = Expression();
@@ -278,11 +298,11 @@ internal class Parser
             if (!Match(TokenType.RightParenthesis))
                 throw new CompilerException(start!.Line, start.Column, CompilerExceptionType.UnclosedParenthesis, Peek());
 
-            return new GroupingNode(expr);
+            return new GroupingExpressionNode(Position.From(start!), expr);
         }
 
         if (Match([TokenType.Subtract], out var token))
-            return new UnaryExpressionNode(token!, token!.Type, Expression());
+            return new UnaryExpressionNode(Position.From(token), (BuiltInOperator) token.Type, Expression());
 
         throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.MissingExpression, "Missing expression.");
     }
