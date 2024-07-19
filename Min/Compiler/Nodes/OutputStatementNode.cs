@@ -1,13 +1,13 @@
 namespace Min.Compiler.Nodes;
 
-public class OutputStatementNode : Node
+public class OutputStatementNode : StatementNode
 {
-    public List<Node> Values { get; set; }
+    public List<ExpressionNode> Values { get; init; }
 
-    public OutputStatementNode(Token start, List<Node> values) : base(start)
+    public OutputStatementNode(Position position, List<ExpressionNode> values) : base(position)
     {
         Values = values;
     }
 
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    public override void Accept(IVisitor visitor) => visitor.Visit(this);
 }

@@ -1,12 +1,12 @@
-namespace Min.Compiler.Nodes2;
+namespace Min.Compiler.Nodes;
 
-public class MultiplicativeExpressionNode : ExpressionNode
+public class ComparisonExpressionNode : ExpressionNode
 {
     public ExpressionNode Left { get; init; }
     public BuiltInOperator Operator { get; init; }
     public ExpressionNode Right { get; init; }
 
-    public MultiplicativeExpressionNode(Position start, ExpressionNode left, BuiltInOperator op, ExpressionNode right) : base(start)
+    public ComparisonExpressionNode(Position start, ExpressionNode left, BuiltInOperator op, ExpressionNode right) : base(start)
     {
         Left = left;
         Operator = op;

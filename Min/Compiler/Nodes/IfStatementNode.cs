@@ -1,25 +1,15 @@
 namespace Min.Compiler.Nodes;
 
-public class IfStatementNode : Node
+public class IfStatementNode : StatementNode
 {
-    public Node? Condition { get; init; }
-    public List<Node> Block { get; init; }
-    public IfStatementNode? Else { get; init; }
+    public ExpressionNode Condition { get; init; }
+    public List<StatementNode> Block { get; init; }
 
-    public IfStatementNode(Token start, List<Node> block) : base(start)
+    public IfStatementNode(Position start, ExpressionNode condition, List<StatementNode> block) : base(start)
     {
+        Condition = condition;
         Block = block;
     }
 
-    public IfStatementNode(Token start, Node condition, List<Node> block) : this(start, block)
-    {
-        Condition = condition;
-    }
-
-    public IfStatementNode(Token start, Node condition, List<Node> block, IfStatementNode? elseNode) : this(start, condition, block)
-    {
-        Else = elseNode;
-    }
-
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    public override void Accept(IVisitor visitor) => visitor.Visit(this);
 }

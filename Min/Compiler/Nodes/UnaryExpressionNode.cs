@@ -1,15 +1,15 @@
 namespace Min.Compiler.Nodes;
 
-public class UnaryExpressionNode : Node
+public class UnaryExpressionNode : ExpressionNode
 {
-    public TokenType Operator { get; init; }
-    public Node Expression { get; init; }
+    public BuiltInOperator Operator { get; set; }
+    public ExpressionNode Value { get; init; }
 
-    public UnaryExpressionNode(Token opToken, TokenType op, Node expression) : base(opToken)
+    public UnaryExpressionNode(Position start, BuiltInOperator op, ExpressionNode value) : base(start)
     {
         Operator = op;
-        Expression = expression;
+        Value = value;
     }
 
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    public override void Accept(IVisitor visitor) => visitor.Visit(this);
 }

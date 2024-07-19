@@ -1,5 +1,5 @@
 using Min.Compiler.Exceptions;
-using Min.Compiler.Nodes2;
+using Min.Compiler.Nodes;
 
 namespace Min.Compiler;
 

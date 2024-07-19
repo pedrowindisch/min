@@ -1,4 +1,4 @@
-namespace Min.Compiler.Nodes2;
+namespace Min.Compiler.Nodes;
 
 public abstract class ASTNode
 {

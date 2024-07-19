@@ -1,23 +1,21 @@
-using Min.Compiler.Exceptions;
-
 namespace Min.Compiler.Nodes;
 
-public class VariableDeclarationNode : Node
+public class VariableDeclarationNode : StatementNode
 {
-    public TokenType VariableType { get; init; }
-    public string Name { get; init; }
-    public Node? Value { get; init; }
+    public string Identifier { get; init; }
+    public BuiltInType Type { get; init; }
+    public ExpressionNode? Value { get; init; }
 
-    public VariableDeclarationNode(Token start, TokenType variableType, string name) : base(start)
+    public VariableDeclarationNode(Position position, string identifier, BuiltInType type) : base(position)
     {
-        VariableType = variableType;
-        Name = name;
+        Identifier = identifier;
+        Type = type;
     }
 
-    public VariableDeclarationNode(Token start, TokenType variableType, string name, Node? value) : this(start, variableType, name)
+    public VariableDeclarationNode(Position position, string identifier, BuiltInType type, ExpressionNode value) : this(position, identifier, type)
     {
         Value = value;
     }
 
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    public override void Accept(IVisitor visitor) => visitor.Visit(this);
 }

@@ -1,13 +1,13 @@
 namespace Min.Compiler.Nodes;
 
-public class InputStatementNode : Node
+public class InputStatementNode : StatementNode
 {
-    public VariableNode Variable { get; set; }
+    public string Identifier { get; init; }
 
-    public InputStatementNode(Token start, VariableNode variable) : base(start)
+    public InputStatementNode(Position start, string identifier) : base(start)
     {
-        Variable = variable;
+        Identifier = identifier;
     }
 
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    public override void Accept(IVisitor visitor) => visitor.Visit(this);
 }

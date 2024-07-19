@@ -4,5 +4,5 @@ namespace Min.Compiler;
 
 internal interface ISemanticAnalysisStep
 {
-    (SymbolTable, List<Node>) Execute(SymbolTable symbolTable, List<Node> nodes);
+    (SymbolTable, ProgramNode) Execute(SymbolTable symbolTable, ProgramNode nodes);
 }
