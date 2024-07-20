@@ -1,11 +1,11 @@
 namespace Min.Compiler.Nodes;
 
-public class VariableAssignmentnNode : StatementNode
+public class VariableAssignmentNode : StatementNode
 {
     public string Identifier { get; init; }
     public ExpressionNode Value { get; init; }
 
-    public VariableAssignmentnNode(Position position, string identifier, ExpressionNode value) : base(position)
+    public VariableAssignmentNode(Position position, string identifier, ExpressionNode value) : base(position)
     {
         Identifier = identifier;
         Value = value;

@@ -154,7 +154,7 @@ internal class Parser
 
     }
 
-    private VariableAssignmentnNode AssignmentStatement()
+    private VariableAssignmentNode AssignmentStatement()
     {
         Match(TokenType.Identifier, out var identifier);
         Match(TokenType.Assign);
@@ -162,7 +162,7 @@ internal class Parser
         try
         {
             ExpressionNode value = Expression();
-            return new VariableAssignmentnNode(
+            return new VariableAssignmentNode(
                 Position.From(identifier!), 
                 identifier.Lexeme,
                 value

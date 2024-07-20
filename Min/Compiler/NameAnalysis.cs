@@ -52,7 +52,7 @@ internal sealed class NameAnalysis
         node.Value.Accept(this);
     }
 
-    public void Visit(VariableAssignmentnNode node)
+    public void Visit(VariableAssignmentNode node)
     {
         if (!_symbols.IsSaved(node.Identifier))
             throw new CompilerException(node.Start.Line, node.Start.Column, CompilerExceptionType.IdentifierNotDeclared, node.Identifier);
