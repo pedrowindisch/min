@@ -4,10 +4,10 @@ using Min.Compiler.Nodes;
 
 namespace Min.Tests.Compiler.ParserTests.Cases;
 
-public class AssignmentStatementTests
+public class VariableAssignmentStatementTests
 {
     [Fact(DisplayName = "Should return the parse tree when evaluating a correct assignment statement.")]
-    public void Parse_AssignmentsStatement_ReturnsTree()
+    public void Parse_AssignmentStatement_ReturnsTree()
     {
         var tokens = new List<Token>()
         {
@@ -19,10 +19,11 @@ public class AssignmentStatementTests
 
         var parser = new Parser(tokens);
 
-        Assert.Equivalent(new List<Node>()
-        {
-            new AssignmentStatementNode(tokens[0], new LiteralNode(tokens[2]))
-        }, parser.Program());
+        Assert.Equivalent(new ProgramNode([new VariableAssignmentNode(
+            Position.From(tokens[0]),
+            ".name", 
+            new StringExpressionNode(Position.From(tokens[2]), "min")
+        )]), parser.Program());
     }
 
     [Fact(DisplayName = "Should throw an exception when evaluating an invalid assignment statement.")]

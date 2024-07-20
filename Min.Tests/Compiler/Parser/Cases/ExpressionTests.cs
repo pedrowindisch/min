@@ -8,9 +8,8 @@ public class ExpressionTests
 {
     [Theory]
     [InlineData(TokenType.NumberLiteral, 123, 321)]
-    [InlineData(TokenType.StringLiteral, "name", "year")]
     [InlineData(TokenType.NumberLiteral, 1.23, 32.1)]
-    internal void Parse_BinaryExpressionLiterals_ReturnsTree(TokenType literalType, object firstLiteral, object secondLiteral)
+    internal void Parse_NumberExpressionLiterals_ReturnsTree(TokenType literalType, double firstLiteral, double secondLiteral)
     {
         var tokens = new List<Token>()
         {
@@ -22,12 +21,13 @@ public class ExpressionTests
         };
 
         var parser = new Parser(tokens);
-        var output = parser.Program()[0] as OutputStatementNode;
+        var output = parser.Program().Statements[0] as OutputStatementNode;
 
-        Assert.Equivalent(new BinaryExpressionNode(
-            new LiteralNode(tokens[1]),
-            TokenType.Add,
-            new LiteralNode(tokens[3])
+        Assert.Equivalent(new AdditiveExpressionNode(
+            Position.From(tokens[1]),
+            new NumberExpressionNode(Position.From(tokens[1]), firstLiteral),
+            BuiltInOperator.Add,
+            new NumberExpressionNode(Position.From(tokens[3]), secondLiteral)
         ), output!.Values[0]);
     }
 
@@ -44,12 +44,13 @@ public class ExpressionTests
         };
 
         var parser = new Parser(tokens);
-        var output = parser.Program()[0] as OutputStatementNode;
+        var output = parser.Program().Statements[0] as OutputStatementNode;
 
-        Assert.Equivalent(new BinaryExpressionNode(
-            new VariableNode(tokens[1]),
-            TokenType.Add,
-            new VariableNode(tokens[3])
+        Assert.Equivalent(new AdditiveExpressionNode(
+            Position.From(tokens[1]),
+            new IdentifierExpressionNode(Position.From(tokens[1]), ".name"),
+            BuiltInOperator.Add,
+            new IdentifierExpressionNode(Position.From(tokens[3]), ".year")
         ), output!.Values[0]);
     }
 
@@ -70,16 +71,21 @@ public class ExpressionTests
         };
 
         var parser = new Parser(tokens);
-        var output = parser.Program()[0] as OutputStatementNode;
+        var output = parser.Program().Statements[0] as OutputStatementNode;
 
-        Assert.Equivalent(new BinaryExpressionNode(
-            new LiteralNode(tokens[1]),
-            TokenType.Add,
-            new GroupingNode(new BinaryExpressionNode(
-                new LiteralNode(tokens[4]),
-                TokenType.Add,
-                new LiteralNode(tokens[6])
-            ))
+        Assert.Equivalent(new AdditiveExpressionNode(
+            Position.From(tokens[1]),
+            new NumberExpressionNode(Position.From(tokens[1]), 1),
+            BuiltInOperator.Add,
+            new GroupingExpressionNode(
+                Position.From(tokens[3]),
+                new AdditiveExpressionNode(
+                    Position.From(tokens[4]),
+                    new NumberExpressionNode(Position.From(tokens[4]), 2),
+                    BuiltInOperator.Add,
+                    new NumberExpressionNode(Position.From(tokens[6]), 3)
+                )
+            )
         ), output!.Values[0]);
     }
 

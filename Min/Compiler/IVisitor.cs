@@ -14,6 +14,7 @@ public interface IVisitor
     void Visit(MultiplicativeExpressionNode node);
     void Visit(AdditiveExpressionNode node);
     void Visit(UnaryExpressionNode node);
+    void Visit(StringExpressionNode node);
     void Visit(NumberExpressionNode node);
     void Visit(BooleanExpressionNode node);
     void Visit(IdentifierExpressionNode node);

@@ -17,10 +17,13 @@ public class VariableDeclarationTests
 
         var parser = new Parser(tokens);
 
-        Assert.Equivalent(new List<Node>()
-        {
-            new VariableDeclarationNode(tokens[0], TokenType.String, ".name")
-        }, parser.Program());
+        Assert.Equivalent(new ProgramNode([
+            new VariableDeclarationNode(
+                Position.From(tokens[0]),
+                ".name",
+                BuiltInType.String
+            )
+        ]), parser.Program());
     }
 
     [Fact]
@@ -37,9 +40,15 @@ public class VariableDeclarationTests
 
         var parser = new Parser(tokens);
 
-        Assert.Equivalent(new List<Node>()
-        {
-            new VariableDeclarationNode(tokens[0], TokenType.String, ".name", new LiteralNode(new Token(1, 11, TokenType.StringLiteral, "min")))
-        }, parser.Program());
+        Assert.Equivalent(new ProgramNode([
+            new VariableDeclarationNode(
+                Position.From(tokens[0]),
+                ".name",
+                BuiltInType.String,
+                new StringExpressionNode(
+                    Position.From(tokens[3]), "min"
+                )
+            )
+        ]), parser.Program());
     }
 }

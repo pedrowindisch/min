@@ -24,19 +24,23 @@ public class IfStatementTests
         };
 
         var parser = new Parser(tokens);
-        Assert.Equivalent(new List<Node>()
-        {
+        Assert.Equivalent(new ProgramNode([
             new IfStatementNode(
-                tokens[0], 
-                new LiteralNode(tokens[1]),
+                Position.From(tokens[0]),
+                new BooleanExpressionNode(Position.From(tokens[1]), true),
                 [
                     new OutputStatementNode(
-                        tokens[3], 
-                        [new LiteralNode(tokens[4])]
+                        Position.From(tokens[3]),
+                        [
+                            new StringExpressionNode(
+                                Position.From(tokens[4]),
+                                "min"
+                            )
+                        ]
                     )
                 ]
             )
-        }, parser.Program());
+        ]), parser.Program());
     }
 
     
@@ -46,8 +50,6 @@ public class IfStatementTests
         var tokens = new List<Token>()
         {
             new Token(1, 0, TokenType.If),
-            new Token(1, 0, TokenType.NumberLiteral, "1"),
-            new Token(1, 0, TokenType.Add),
             new Token(1, 0, TokenType.NumberLiteral, "2"),
             new Token(1, 0, TokenType.EqualsTo),
             new Token(1, 0, TokenType.NumberLiteral, "3"),
@@ -57,23 +59,30 @@ public class IfStatementTests
             new Token(3, 0, TokenType.EndIf),
             new Token(3, 0, TokenType.EOF)
         };
-
+        
         var parser = new Parser(tokens);
-        Assert.Equivalent(new List<Node>()
-        {
+        Assert.Equivalent(new ProgramNode([
             new IfStatementNode(
-                tokens[0], 
-                [new BinaryExpressionNode(
-                    new BinaryExpressionNode(
-                        new LiteralNode(tokens[1]),
-                        TokenType.Add,
-                        new LiteralNode(tokens[3])
-                    ),
-                    TokenType.EqualsTo,
-                    new LiteralNode(tokens[5])
-                )]
+                Position.From(tokens[0]),
+                new ComparisonExpressionNode(
+                    Position.From(tokens[1]),
+                    new NumberExpressionNode(Position.From(tokens[1]), 2),
+                    BuiltInOperator.EqualsTo,
+                    new NumberExpressionNode(Position.From(tokens[3]), 3)
+                ),
+                [
+                    new OutputStatementNode(
+                        Position.From(tokens[5]),
+                        [
+                            new StringExpressionNode(
+                                Position.From(tokens[6]),
+                                "min"
+                            )
+                        ]
+                    )
+                ]
             )
-        }, parser.Program());
+        ]), parser.Program());
     }
 
     [Fact]

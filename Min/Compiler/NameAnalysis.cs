@@ -89,8 +89,10 @@ internal sealed class NameAnalysis
 
     public void Visit(BooleanExpressionNode node) { }
     public void Visit(NumberExpressionNode node) {}
+    public void Visit(StringExpressionNode node) { }
     public void Visit(ProgramNode node)
     {
         throw new Exception("Should never have two program nodes inside the same program.");
     }
+
 }

@@ -17,10 +17,14 @@ public class OutputStatementTests
         };
 
         var parser = new Parser(tokens);
-        Assert.Equivalent(new List<Node>()
-        {
-            new OutputStatementNode(tokens[0], [new LiteralNode(tokens[1])])
-        }, parser.Program());
+        Assert.Equivalent(new ProgramNode([
+            new OutputStatementNode(
+                Position.From(tokens[0]),
+                [
+                    new BooleanExpressionNode(Position.From(tokens[1]), true)
+                ]
+            )
+        ]), parser.Program());
     } 
 
     [Fact]
@@ -36,13 +40,15 @@ public class OutputStatementTests
         };
 
         var parser = new Parser(tokens);
-        Assert.Equivalent(new List<Node>()
-        {
-            new OutputStatementNode(tokens[0], [
-                new LiteralNode(tokens[1]), 
-                new LiteralNode(tokens[3])
-            ])
-        }, parser.Program());
+        Assert.Equivalent(new ProgramNode([
+            new OutputStatementNode(
+                Position.From(tokens[0]),
+                [
+                    new BooleanExpressionNode(Position.From(tokens[1]), true),
+                    new StringExpressionNode(Position.From(tokens[3]), "min")
+                ]
+            )
+        ]), parser.Program());
     }
 
     [Fact]

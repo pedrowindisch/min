@@ -274,14 +274,15 @@ internal class Parser
         if (Match(TokenType.NumberLiteral, out var numericToken))
             return new NumberExpressionNode(Position.From(numericToken!), double.Parse(numericToken.Lexeme));
 
-        
         if (Match([TokenType.True, TokenType.False], out var boolToken))
-            return new BooleanExpressionNode(Position.From(boolToken!), bool.Parse(boolToken.Lexeme));
+            return new BooleanExpressionNode(Position.From(boolToken!), boolToken!.Type is TokenType.True);
 
         if (Match(TokenType.Identifier, out var identifier))
             return new IdentifierExpressionNode(Position.From(identifier!), identifier.Lexeme);
 
         // @todo match string as well later
+        if (Match(TokenType.StringLiteral, out var str))
+            return new StringExpressionNode(Position.From(str), str.Lexeme!);
 
         if (Match(TokenType.LeftParenthesis, out var start))
         {
