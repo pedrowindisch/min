@@ -2,121 +2,135 @@ using Min.Compiler.Nodes;
 
 namespace Min.Compiler;
 
-internal sealed class TypeChecker : ISemanticAnalysisStep // , IVisitor<TokenType>
+internal sealed class TypeChecker : ISemanticAnalysisStep, IVisitor
 {
     private SymbolTable _symbols = null!;
 
     public (SymbolTable, ProgramNode) Execute(SymbolTable symbols, ProgramNode nodes)
     {
-        // _symbols = symbols;
-        // foreach (var node in nodes)
-        //     node.Accept(this);
+        _symbols = symbols;
+        foreach (var node in nodes.Statements)
+            node.Accept(this);
 
         return (_symbols, nodes);
     }
 
-    // private TokenType BinaryOperationToExpectedType(TokenType op, TokenType leftSideType)
-    // {
-    //     // Equality operators - both sides must be the same.
-    //     // if (op is TokenType.EqualsTo or TokenType.NotEqualsTo) 
-    //     //     return leftSideType;
+    private BuiltInType CheckType(ExpressionNode expr)
+    {
+        if (expr is StringExpressionNode) return BuiltInType.String;
+        if (expr is BooleanExpressionNode) return BuiltInType.Bool;
+        if (expr is NumberExpressionNode) return BuiltInType.Int;
+        if (expr is IdentifierExpressionNode vex) return _symbols.GetType(vex.Identifier);
+        if (expr is GroupingExpressionNode gex) return CheckType(gex.Value);
+        if (expr is UnaryExpressionNode uex) return CheckType(uex.Value);
 
-    //     // if (op is TokenType.GreaterThanOrEqual or TokenType.GreaterThan or TokenType.LessThanOrEqual or TokenType.LessThan)
-    //     // {
-    //     //     if (leftSideType is not TokenType.Int or TokenType.Float)
-    //     //         throw new Exception("invalid types - relational operators only work on numeric types");
+        if (expr is ComparisonExpressionNode cex)
+        {
+            var leftType = CheckType(cex.Left);
+            var rightType = CheckType(cex.Right);
 
-    //     //     return leftSideType;
-    //     // }
+            if (leftType != rightType)
+                throw new Exception("Operations only work on equal types.");
 
-    //     // if (leftSideType is TokenType.Bool)
-    //     //     throw new Exception("booleans do not support binary operations.");
+            if (cex.Operator is BuiltInOperator.GreaterThan or BuiltInOperator.GreaterThanOrEquals or BuiltInOperator.LessThan or BuiltInOperator.LessThanOrEquals)
+            {
+                if (leftType is not (BuiltInType.Int or BuiltInType.Float))
+                    throw new Exception("Relational operators only works on integers");
+            }
 
-    //     // if (leftSideType is TokenType.String)
-    //     // {
-    //     //     if (op is TokenType.Divide or TokenType.Subtract)
-    //     //         throw new Exception("cannot divide or subtract strings");
+            return BuiltInType.Bool;
+        }
 
-    //     //     return TokenType.String;
-    //     // }
+        if (expr is AdditiveExpressionNode aex)
+        {
+            var leftType = CheckType(aex.Left);
+            var rightType = CheckType(aex.Right);
 
-    //     // return leftSideType;
-    // }
+            if (leftType != rightType)
+                throw new Exception("Operations only work on equal types.");
 
-    // public TokenType Visit(VariableDeclarationNode node)
-    // {
-    //     // if (node.Value is not null)
-    //     // {
-    //     //     var valueType = node.Value.Accept(this);
-    //     //     if (valueType != node.VariableType)
-    //     //         throw new Exception("invalid declaration - types are not compatible");
-    //     // }
+            if (aex.Operator is BuiltInOperator.Subtract)
+            {
+                if (leftType is not (BuiltInType.Int or BuiltInType.Float))
+                    throw new Exception("Subtraction only works on integers");
 
-    //     // return node.VariableType;
-    // }
+                return leftType;
+            }
 
-    // public TokenType Visit(LiteralNode node) =>
-    //     node.Token.Type switch
-    //     {
-    //         TokenType.NumberLiteral => TokenType.Int, 
-    //         TokenType.StringLiteral => TokenType.String, 
-    //         TokenType.True => TokenType.Bool, 
-    //         TokenType.False => TokenType.Bool, 
-    //     };
+            if (leftType is BuiltInType.Bool)
+                throw new Exception("Addition does not work on bools");
 
-    // public TokenType Visit(BinaryExpressionNode node)
-    // {
-    //     var leftSideType = node.Left.Accept(this);
-    //     var rightSideType = node.Right.Accept(this);
+            return leftType;
+        }
 
-    //     var expectedType = BinaryOperationToExpectedType(node.Operator, leftSideType);
-    //     if (rightSideType != expectedType)
-    //         throw new Exception("invalid operation - types are not compatible");
 
-    //     if (node.Operator is TokenType.EqualsTo or TokenType.NotEqualsTo or TokenType.GreaterThan or TokenType.GreaterThanOrEqual or TokenType.LessThan or TokenType.LessThanOrEqual)
-    //         return TokenType.Bool;
+        if (expr is MultiplicativeExpressionNode mex)
+        {
+            var leftType = CheckType(mex.Left);
+            var rightType = CheckType(mex.Right);
 
-    //     return expectedType;
-    // }
+            if (leftType != rightType)
+                throw new Exception("Operations only work on equal types.");
 
-    // public TokenType Visit(UnaryExpressionNode node)
-    // {
-    //     return default;
-    // }
+            if (mex.Operator is BuiltInOperator.Subtract)
+            {
+                if (leftType is not (BuiltInType.Int or BuiltInType.Float))
+                    throw new Exception("Subtraction only works on integers");
+            }
 
-    // public TokenType Visit(VariableNode node)
-    // {
-    //     return default;
-    // }
+            if (leftType is BuiltInType.Bool)
+                throw new Exception("Addition does not work on bools");
 
-    // public TokenType Visit(GroupingNode node)
-    // {
-    //     return default;
-    // }
+            return leftType;
+        }
 
-    // public TokenType Visit(AssignmentStatementNode node)
-    // {
-    //     return default;
-    // }
+        throw new Exception("not implemented");
+    }
 
-    // public TokenType Visit(InputStatementNode node)
-    // {
-    //     return default;
-    // }
+    private bool IsExpectedType(BuiltInType expected, ExpressionNode expr) => expected == CheckType(expr);
+    private bool IsExpectedType(BuiltInType[] expected, ExpressionNode expr) => expected.Contains(CheckType(expr));
 
-    // public TokenType Visit(OutputStatementNode node)
-    // {
-    //     return default;
-    // }
+    public void Visit(UnaryExpressionNode node)
+    {
+        if (!IsExpectedType([BuiltInType.Int, BuiltInType.Float], node.Value))
+            throw new Exception("unary expression should only accept integers or floats");
+    }
+    
+    public void Visit(VariableAssignmentNode node)
+    {
+        if (!IsExpectedType(_symbols.GetType(node.Identifier), node.Value))
+            throw new Exception("wrong value - diffent type than the variable declaration");
+    }
 
-    // public TokenType Visit(IfStatementNode node)
-    // {
-    //     if (node.Condition is not null)
-    //     {
-    //         if (node.Condition.Accept(this) is not TokenType.Bool)
-    //             throw new Exception("invalid type...");
-    //     }
+    public void Visit(IfStatementNode node)
+    {
+        if (!IsExpectedType(BuiltInType.Bool, node.Condition))
+            throw new Exception("wrong condition type");    
+    }
 
-    //     return default;
-    // }
+    public void Visit(VariableDeclarationNode node)
+    {
+        if (node.Value is null) return;
+
+        if (!IsExpectedType(node.Type, node.Value))
+            throw new Exception("wrong declaration type");
+    }
+
+    public void Visit(OutputStatementNode node) 
+    {
+        foreach (var value in node.Values) 
+            value.Accept(this);
+    }
+
+    public void Visit(ComparisonExpressionNode node) => CheckType(node);
+    public void Visit(MultiplicativeExpressionNode node) => CheckType(node);
+    public void Visit(AdditiveExpressionNode node) => CheckType(node);
+    public void Visit(GroupingExpressionNode node) => CheckType(node);
+    
+    public void Visit(ProgramNode node) { }
+    public void Visit(InputStatementNode node) { }
+    public void Visit(StringExpressionNode node) { }
+    public void Visit(NumberExpressionNode node) { }
+    public void Visit(BooleanExpressionNode node) { }
+    public void Visit(IdentifierExpressionNode node) { }
 }
