@@ -1,0 +1,5 @@
+.value = 123
+
+if .value = 1:
+    output "bigger than 1"
+endif

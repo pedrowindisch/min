@@ -1,0 +1,4 @@
+.min string = "min"
+
+output .min
+output .min, "lang"

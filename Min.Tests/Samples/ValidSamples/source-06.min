@@ -1,0 +1,5 @@
+.negativeValue int = 123
+out "before: ", .negativeValue
+
+.negativeValue = 123 * -1
+out "after: ", .negativeValue

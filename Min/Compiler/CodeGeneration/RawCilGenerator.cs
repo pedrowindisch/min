@@ -129,7 +129,10 @@ public class RawCilGenerator(SymbolTable symbols, ProgramNode root) : BaseCodeGe
 
     public void Visit(UnaryExpressionNode node)
     {
-        throw new NotImplementedException();
+        _typeStack.Push(BuiltInType.Int);
+        _code.AppendLine($"lcd.i4 {node.Value}");
+        _code.AppendLine("ldc.i4 -1");
+        _code.AppendLine("mul");
     }
 
     public void Visit(StringExpressionNode node)

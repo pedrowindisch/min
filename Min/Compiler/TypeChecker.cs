@@ -1,3 +1,4 @@
+using Min.Compiler.Exceptions;
 using Min.Compiler.Nodes;
 
 namespace Min.Compiler;
@@ -30,12 +31,12 @@ internal sealed class TypeChecker : ISemanticAnalysisStep, IVisitor
             var rightType = CheckType(cex.Right);
 
             if (leftType != rightType)
-                throw new Exception("Operations only work on equal types.");
+                throw new CompilerException(cex.Right.Start, CompilerExceptionType.IncompatibleType, "both sides of the operation must have the same type");
 
             if (cex.Operator is BuiltInOperator.GreaterThan or BuiltInOperator.GreaterThanOrEquals or BuiltInOperator.LessThan or BuiltInOperator.LessThanOrEquals)
             {
                 if (leftType is not (BuiltInType.Int or BuiltInType.Float))
-                    throw new Exception("Relational operators only works on integers");
+                    throw new CompilerException(cex.Left.Start, CompilerExceptionType.IncompatibleType, "relational operators only works on numerical types");
             }
 
             return BuiltInType.Bool;
@@ -47,22 +48,13 @@ internal sealed class TypeChecker : ISemanticAnalysisStep, IVisitor
             var rightType = CheckType(aex.Right);
 
             if (leftType != rightType)
-                throw new Exception("Operations only work on equal types.");
+                throw new CompilerException(aex.Right.Start, CompilerExceptionType.IncompatibleType, "both sides of the operation must have the same type");
 
-            if (aex.Operator is BuiltInOperator.Subtract)
-            {
-                if (leftType is not (BuiltInType.Int or BuiltInType.Float))
-                    throw new Exception("Subtraction only works on integers");
-
-                return leftType;
-            }
-
-            if (leftType is BuiltInType.Bool)
-                throw new Exception("Addition does not work on bools");
+            if (leftType is not (BuiltInType.Int or BuiltInType.Float))
+                throw new CompilerException(aex.Left.Start, CompilerExceptionType.IncompatibleType, "arithmetic operators only works on numerical types");
 
             return leftType;
         }
-
 
         if (expr is MultiplicativeExpressionNode mex)
         {
@@ -70,16 +62,10 @@ internal sealed class TypeChecker : ISemanticAnalysisStep, IVisitor
             var rightType = CheckType(mex.Right);
 
             if (leftType != rightType)
-                throw new Exception("Operations only work on equal types.");
+                throw new CompilerException(mex.Right.Start, CompilerExceptionType.IncompatibleType, "both sides of the operation must have the same type");
 
-            if (mex.Operator is BuiltInOperator.Subtract)
-            {
-                if (leftType is not (BuiltInType.Int or BuiltInType.Float))
-                    throw new Exception("Subtraction only works on integers");
-            }
-
-            if (leftType is BuiltInType.Bool)
-                throw new Exception("Addition does not work on bools");
+            if (leftType is not (BuiltInType.Int or BuiltInType.Float))
+                throw new CompilerException(mex.Left.Start, CompilerExceptionType.IncompatibleType, "arithmetic operators only works on numerical types");
 
             return leftType;
         }
@@ -88,6 +74,13 @@ internal sealed class TypeChecker : ISemanticAnalysisStep, IVisitor
     }
 
     private bool IsExpectedType(BuiltInType expected, ExpressionNode expr) => expected == CheckType(expr);
+    private bool IsExpectedType(BuiltInType expected, ExpressionNode expr, out BuiltInType actualType)
+    {
+        actualType = CheckType(expr);
+
+        return expected == actualType;
+    }
+
     private bool IsExpectedType(BuiltInType[] expected, ExpressionNode expr) => expected.Contains(CheckType(expr));
 
     public void Visit(UnaryExpressionNode node)
@@ -98,8 +91,9 @@ internal sealed class TypeChecker : ISemanticAnalysisStep, IVisitor
     
     public void Visit(VariableAssignmentNode node)
     {
-        if (!IsExpectedType(_symbols.GetType(node.Identifier), node.Value))
-            throw new Exception("wrong value - diffent type than the variable declaration");
+        var variableType = _symbols.GetType(node.Identifier);
+        if (!IsExpectedType(variableType, node.Value, out var actualType))
+            throw new CompilerException(node.Start.Line, node.Start.Column, CompilerExceptionType.IncompatibleType, $"the variable {node.Identifier} was declared as a {variableType.ToFriendlyString()}, but the new value is a {actualType.ToFriendlyString()}");
     }
 
     public void Visit(IfStatementNode node)
@@ -112,8 +106,8 @@ internal sealed class TypeChecker : ISemanticAnalysisStep, IVisitor
     {
         if (node.Value is null) return;
 
-        if (!IsExpectedType(node.Type, node.Value))
-            throw new Exception("wrong declaration type");
+        if (!IsExpectedType(node.Type, node.Value, out var actualType))
+            throw new CompilerException(node.Start.Line, node.Start.Column, CompilerExceptionType.IncompatibleType, $"the variable {node.Identifier} was declared as a {node.Type.ToFriendlyString()}, but the initial value you provided is a {actualType.ToFriendlyString()}");
     }
 
     public void Visit(OutputStatementNode node) 

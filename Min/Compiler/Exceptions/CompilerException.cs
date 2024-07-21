@@ -12,4 +12,6 @@ public class CompilerException : Exception
         Column = column;
         Type = type;
     }
+
+    public CompilerException(Position position, CompilerExceptionType type, params object[] arguments) : this(position.Line, position.Column, type, arguments) { }
 }

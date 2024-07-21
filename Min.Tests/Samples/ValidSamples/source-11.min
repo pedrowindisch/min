@@ -1,0 +1,4 @@
+.first string = "min"
+.second string = "lang"
+
+.areEqual bool = .first == .second

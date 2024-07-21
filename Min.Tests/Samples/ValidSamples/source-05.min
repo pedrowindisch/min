@@ -1,0 +1,4 @@
+.year int = 2024
+.year = 2023
+
+output .year

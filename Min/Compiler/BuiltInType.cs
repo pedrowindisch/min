@@ -22,4 +22,15 @@ public static class BuiltInTypeHelpers
         
             _ => throw new Exception("should not be called")
         };
+
+    public static string ToFriendlyString(this BuiltInType type) =>
+        type switch
+        {
+            BuiltInType.Int => "integer",
+            BuiltInType.Float => "floating point number",
+            BuiltInType.String => "string",
+            BuiltInType.Bool => "boolean",
+
+            _ => throw new Exception("should not be called"),
+        };
 }

@@ -3,11 +3,11 @@ using Xunit.Sdk;
 
 namespace Min.Tests.Utils;
 
-public class FileDataAttribute(string path) : DataAttribute
+public class SamplesDataAttribute(string sampleType) : DataAttribute
 {
-    private readonly string _path = path;
+    private readonly string _path = Path.Combine("Samples", sampleType);
 
-    public override IEnumerable<object[]> GetData(MethodInfo testMethod)
+    public override IEnumerable<string[]> GetData(MethodInfo testMethod)
     {
         if (File.Exists(_path))
         {
@@ -15,7 +15,7 @@ public class FileDataAttribute(string path) : DataAttribute
             yield break;
         }
 
-        if (Directory.Exists(_path))
+        if (Directory.Exists(_path)) 
         {
             foreach (var file in Directory.EnumerateFiles(_path))
                 yield return File.ReadAllLines(file);

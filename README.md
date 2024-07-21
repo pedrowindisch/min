@@ -7,7 +7,7 @@ The main objective of this project is to create a simple programming language, p
 The _min_ compiler outputs CIL (Common Intermediate Language) code.
 
 ## Language specification
-The _min_ syntax is intentionally small. For a detailed specification, please refer to [SPECS.md](SPECS.md), [examples](examples) folder or the eBNF grammar in [grammar.ebnf](min.ebnf).
+The _min_ syntax is intentionally small. For a detailed specification, please refer to [SPECS.md](SPECS.md), [samples](Min.Tests/Samples/ValidSamples/) folder inside the compiler tests project or the eBNF grammar in [min.ebnf](min.ebnf).
 
 ## _min_ in five minutes
 ```
