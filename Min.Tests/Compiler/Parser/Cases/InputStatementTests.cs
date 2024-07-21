@@ -11,7 +11,7 @@ public class InputStatementTests
     {
         var tokens = new List<Token>()
         {
-            new Token(1, 0, TokenType.Identifier),
+            new Token(1, 0, TokenType.Input),
             new Token(1, 0, TokenType.Identifier, ".min"),
             new Token(3, 0, TokenType.EOF)
         };
