@@ -1,10 +1,9 @@
 using System.Text;
-using Min.Compiler.Exceptions;
 using Min.Compiler.Nodes;
 
 namespace Min.Compiler.CodeGeneration;
 
-public class CilGenerator(SymbolTable symbols, ProgramNode root) : BaseCodeGenerator(symbols, root), IVisitor
+public class RawCilGenerator(SymbolTable symbols, ProgramNode root) : BaseCodeGenerator(symbols, root), IVisitor
 {
     private readonly string HEADERS = string.Join('\n', new string[] {
         ".assembly extern mscorlib {}",

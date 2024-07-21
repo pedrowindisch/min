@@ -21,7 +21,7 @@ public class Min(string sourceCode)
         var (Symbols, Nodes) = semanticPipeline.Execute();
 
         // Study how to allow the user to extend the generator classes.
-        BaseCodeGenerator generator = new CilGenerator(
+        BaseCodeGenerator generator = new RawCilGenerator(
             Symbols,
             Nodes
         );
