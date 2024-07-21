@@ -4,74 +4,161 @@ using Min.Compiler.Nodes;
 
 namespace Min.Compiler.CodeGeneration;
 
-public class CilGenerator(SymbolTable symbols, ProgramNode root) : BaseCodeGenerator(symbols, root) // , IVisitor<string>
+public class CilGenerator(SymbolTable symbols, ProgramNode root) : BaseCodeGenerator(symbols, root), IVisitor
 {
+    private readonly string HEADERS = string.Join('\n', new string[] {
+        ".assembly extern mscorlib {}",
+        ".assembly 'App' {}",
+        ".class private auto ansi beforefieldinit abstract sealed Program extends [mscorlib]System.Object {",
+        ".method private hidebysig static void Main(string[] args) cil managed {",
+        ".entrypoint",
+    });
+
+    private readonly string FOOTERS = string.Join('\n', new string[] {
+        "ret",
+        "}",
+        "}"
+    });
+
+    private readonly Dictionary<BuiltInType, string> BuiltInTypeCilMap = new()
+    {
+        { BuiltInType.Bool, "bool" },
+        { BuiltInType.Int, "int32" },
+        { BuiltInType.Float, "float32" },
+        { BuiltInType.String, "string" }
+    };
+
+    private readonly Dictionary<BuiltInOperator, string[]> OperatorCilMap = new()
+    {
+        { BuiltInOperator.Add, ["add"] },
+        { BuiltInOperator.Subtract, ["sub"] },
+        { BuiltInOperator.Multiply, ["mul"] },
+        { BuiltInOperator.Divide, ["div"] },
+        { BuiltInOperator.EqualsTo, ["ceq"] },
+        { BuiltInOperator.NotEqualsTo, ["ceq", "not"] },
+        { BuiltInOperator.GreaterThan, ["cgt"] },
+        { BuiltInOperator.GreaterThanOrEquals, ["clt", "not"] },
+        { BuiltInOperator.LessThan, ["clt"] },
+        { BuiltInOperator.LessThanOrEquals, ["cgt", "not"] }
+    };
+
+    private readonly Stack<BuiltInType> _typeStack = new();
+    private readonly StringBuilder _code = new();
+
     public override string Execute()
     {
-        var code = new StringBuilder();
+        _code.Append(HEADERS);
 
-        foreach (var node in root.Statements)
-            // code.AppendLine(node.Accept(this));
-            code.Append('a');
+        foreach (var node in _root.Statements)
+            node.Accept(this);
 
-        return code.ToString();        
+        _code.Append(FOOTERS);
+        return _code.ToString();        
     }
 
-    // public string Visit(VariableDeclarationNode node)
-    // {
-    //     var value = node.Value is not null ? node.Value.Accept(this) : "";
+    public void Visit(ProgramNode node)
+    {
+        _code.AppendLine(".entrypoint");
+    }
 
-    //     return $"{node.Name} {{ {value} }}";
-    // }
+    public void Visit(VariableDeclarationNode node)
+    {
+        _code.AppendLine($".locals ({BuiltInTypeCilMap[node.Type]} {node.Identifier})");
 
-    // public string Visit(LiteralNode node) =>
-    //     node.Start.Type switch
-    //     {
-    //         TokenType.NumberLiteral => $"number {node.Token.Lexeme}",
-    //         TokenType.StringLiteral => $"string \"{node.Token.Lexeme}\"",
-    //         TokenType.True or TokenType.False => $"bool {node.Token.Lexeme}",
-    //         _ => throw new Exception()
-    //     };
+        if (node.Value is not null)
+        {
+            node.Value.Accept(this);
+            _code.AppendLine($"stloc {node.Identifier}");
+        }
+    }
 
-    // public string Visit(BinaryExpressionNode node)
-    // {
-    //     var message = $"{node.Operator} {{ {node.Left.Accept(this)}, {node.Right.Accept(this)} }}";
+    public void Visit(VariableAssignmentNode node)
+    {
+        node.Value.Accept(this);
+        _code.AppendLine($"stloc {node.Identifier}");
+    }
 
-    //     return message;
-    // }
+    public void Visit(IfStatementNode node)
+    {
+        throw new NotImplementedException();
+    }
 
-    // public string Visit(VariableNode node)
-    // {
-    //     return node.Name;
-    // }
+    public void Visit(InputStatementNode node)
+    {
+        _code.AppendLine("call string [mscorlib]System.Console::ReadLine()");
+        _code.AppendLine($"stloc {node.Identifier}");
+    }
 
-    // public string Visit(GroupingNode node)
-    // {
-    //     return $"( {node.Expression.Accept(this)} )";
-    // }
+    public void Visit(OutputStatementNode node)
+    {
+        foreach (var expression in node.Values)
+        {
+            expression.Accept(this);
+            _code.AppendLine($"call void [mscorlib]System.Console::WriteLine({BuiltInTypeCilMap[_typeStack.Pop()]})");
+        }
+    }
 
-    // public string Visit(AssignmentStatementNode node)
-    // {
-    //     return $"assign {{ {node.Identifier} = {node.Value.Accept(this)} }}";
-    // }
+    public void Visit(ComparisonExpressionNode node)
+    {
+        node.Left.Accept(this);
+        node.Right.Accept(this);
 
-    // public string Visit(InputStatementNode node)
-    // {
-    //     return $"input {{ {node.Variable.Accept(this)} }}";
-    // }
+        var operatorCil = OperatorCilMap[node.Operator];
+        foreach (var op in operatorCil)
+            _code.AppendLine(op);
+    }
 
-    // public string Visit(OutputStatementNode node)
-    // {
-    //     return "output { " + string.Join(", ", node.Values.Select(node => node.Accept(this))) + " }";
-    // }
+    public void Visit(MultiplicativeExpressionNode node)
+    {
+        node.Left.Accept(this);
+        node.Right.Accept(this);
 
-    // public string Visit(IfStatementNode node)
-    // {
-    //     return $"if ({node.Condition!.Accept(this)}) {{ {string.Join(", ", node.Block.Select(n => n.Accept(this)))} }}";
-    // }
+        var operatorCil = OperatorCilMap[node.Operator];
+        foreach (var op in operatorCil)
+            _code.AppendLine(op);
+    }
 
-    // public string Visit(UnaryExpressionNode node)
-    // {
-    //     throw new NotImplementedException();
-    // }
+    public void Visit(AdditiveExpressionNode node)
+    {
+        node.Left.Accept(this);
+        node.Right.Accept(this);
+
+        var operatorCil = OperatorCilMap[node.Operator];
+        foreach (var op in operatorCil)
+            _code.AppendLine(op);
+    }
+
+    public void Visit(UnaryExpressionNode node)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(StringExpressionNode node)
+    {
+        _typeStack.Push(BuiltInType.String);
+        _code.AppendLine($"ldstr \"{node.Value}\"");
+    }
+
+    public void Visit(NumberExpressionNode node)
+    {
+        _typeStack.Push(BuiltInType.Int);
+        _code.AppendLine($"ldc.i4 {node.Value}");
+    }
+
+    public void Visit(BooleanExpressionNode node)
+    {
+        _typeStack.Push(BuiltInType.Bool);
+        _code.AppendLine($"ldc.i4 {(node.Value ? 1 : 0)}");
+    }
+
+    public void Visit(IdentifierExpressionNode node)
+    {
+        _typeStack.Push(_symbols.GetType(node.Identifier));
+        _code.AppendLine($"ldloc {node.Identifier}");
+    }
+
+    public void Visit(GroupingExpressionNode node)
+    {
+        node.Value.Accept(this);
+    }
 }
