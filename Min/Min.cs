@@ -15,8 +15,7 @@ public class Min(string sourceCode)
 
         var semanticPipeline = new SemanticAnalysisPipeline(symbolTable, nodes);
         semanticPipeline.AddStep<NameAnalysis>();
-        // @todo I still have to study how to implement a correct and functional type checker.
-        // semanticPipeline.AddStep<TypeChecker>();
+        semanticPipeline.AddStep<TypeChecker>();
         // semanticPipeline.AddStep<ConstantFoldingStep>();
 
         var (Symbols, Nodes) = semanticPipeline.Execute();
