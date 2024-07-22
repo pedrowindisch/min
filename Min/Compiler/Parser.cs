@@ -205,10 +205,82 @@ internal class Parser
             }
         }
 
-        Match(TokenType.EndIf); // endif
+        List<ElseIfStatementNode> elseIfStatements = ElseIfStatements();
+        ElseStatementNode? elseStatement = null;
+        if (Peek(-1) is { Type: TokenType.Else })
+            elseStatement = ElseStatement();
+
         return new IfStatementNode(
             Position.From(start!), 
             condition, 
+            block,
+            elseIfStatements,
+            elseStatement
+        );
+    }
+
+    private List<ElseIfStatementNode> ElseIfStatements()
+    {
+        List<ElseIfStatementNode> statements = [];
+        while (Match(TokenType.If))
+        {
+            if (Match(TokenType.Colon)) // else statement
+                break;
+
+            statements.Add(ElseIfStatement());
+        }
+
+        return statements;
+    }
+
+    private ElseStatementNode ElseStatement()
+    {
+        var start = Peek(-1);
+        if (!Match(TokenType.Colon))
+            throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedCharacter, "An else keyword must be followed by a colon.");
+
+        List<StatementNode> block = [];
+        while (!Match(TokenType.EndIf))
+        {
+            try
+            {
+                block.Add(Statement());
+            }
+            catch (CompilerException ex) when (ex.Type == CompilerExceptionType.UnexpectedEOF)
+            {
+                throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedEOF, "You must finish your if block with a 'endif' keyword.");
+            }
+        }
+
+        return new ElseStatementNode(
+            Position.From(start),
+            block
+        );
+    }
+
+    private ElseIfStatementNode ElseIfStatement()
+    {
+        var start = Peek(-2);
+        var condition = Expression();
+        if (!Match(TokenType.Colon)) 
+            throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedCharacter, "The condition of an if statement must be followed by a colon.");
+
+        List<StatementNode> block = [];
+        while (!Match([TokenType.EndIf, TokenType.Else]))
+        {
+            try
+            {
+                block.Add(Statement());
+            }
+            catch (CompilerException ex) when (ex.Type == CompilerExceptionType.UnexpectedEOF)
+            {
+                throw new CompilerException(Peek().Line, Peek().Column, CompilerExceptionType.UnexpectedEOF, "You must finish your if block with a 'endif' keyword.");
+            }
+        }
+
+        return new ElseIfStatementNode(
+            Position.From(start),
+            condition,
             block
         );
     }
@@ -282,7 +354,7 @@ internal class Parser
 
         // @todo match string as well later
         if (Match(TokenType.StringLiteral, out var str))
-            return new StringExpressionNode(Position.From(str), str.Lexeme!);
+            return new StringExpressionNode(Position.From(str!), str.Lexeme!);
 
         if (Match(TokenType.LeftParenthesis, out var start))
         {

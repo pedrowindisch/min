@@ -102,6 +102,12 @@ internal sealed class TypeChecker : ISemanticAnalysisStep, IVisitor
             throw new Exception("wrong condition type");    
     }
 
+    public void Visit(ElseIfStatementNode node)
+    {
+        if (!IsExpectedType(BuiltInType.Bool, node.Condition))
+            throw new Exception("wrong condition type");
+    }
+
     public void Visit(VariableDeclarationNode node)
     {
         if (node.Value is null) return;
@@ -127,4 +133,5 @@ internal sealed class TypeChecker : ISemanticAnalysisStep, IVisitor
     public void Visit(NumberExpressionNode node) { }
     public void Visit(BooleanExpressionNode node) { }
     public void Visit(IdentifierExpressionNode node) { }
+    public void Visit(ElseStatementNode node) { }
 }

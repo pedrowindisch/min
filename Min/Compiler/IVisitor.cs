@@ -8,6 +8,8 @@ public interface IVisitor
     void Visit(VariableDeclarationNode node);
     void Visit(VariableAssignmentNode node);
     void Visit(IfStatementNode node);
+    void Visit(ElseIfStatementNode node);
+    void Visit(ElseStatementNode node);
     void Visit(InputStatementNode node);
     void Visit(OutputStatementNode node);
     void Visit(ComparisonExpressionNode node);

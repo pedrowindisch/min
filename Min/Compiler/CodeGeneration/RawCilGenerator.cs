@@ -42,6 +42,7 @@ public class RawCilGenerator(SymbolTable symbols, ProgramNode root) : BaseCodeGe
     };
 
     private readonly Stack<BuiltInType> _typeStack = new();
+    private readonly Stack<string> _branchStack = new();
     private readonly StringBuilder _code = new();
 
     public override string Execute()
@@ -54,6 +55,8 @@ public class RawCilGenerator(SymbolTable symbols, ProgramNode root) : BaseCodeGe
         _code.Append(FOOTERS);
         return _code.ToString();        
     }
+
+    private string GenerateBranchCode() => "b" + Guid.NewGuid();
 
     public void Visit(ProgramNode node)
     {
@@ -76,10 +79,67 @@ public class RawCilGenerator(SymbolTable symbols, ProgramNode root) : BaseCodeGe
         node.Value.Accept(this);
         _code.AppendLine($"stloc {node.Identifier}");
     }
-
     public void Visit(IfStatementNode node)
     {
-        throw new NotImplementedException();
+        node.Condition.Accept(this);
+
+        var newBranch = GenerateBranchCode();
+        var exitBranch = GenerateBranchCode();
+
+        _branchStack.Push(newBranch);
+
+        _code.AppendLine($"brfalse.s {newBranch}");
+
+        foreach (var statement in node.Block)
+            statement.Accept(this);
+
+        _code.AppendLine($"br.s {exitBranch}");
+
+        if (node.ElseIfStatements is not null)
+        {
+            foreach (var elseIfBlock in node.ElseIfStatements)
+            {
+                _code.AppendLine($"{newBranch}:");
+
+                newBranch = GenerateBranchCode();
+                _branchStack.Push(exitBranch);
+                _branchStack.Push(newBranch); 
+                
+                elseIfBlock.Accept(this);
+            }
+        }
+
+        if (node.ElseStatement is not null)
+        {
+            _branchStack.Push(exitBranch);
+            node.ElseStatement.Accept(this);
+        }
+
+        _code.AppendLine($"{exitBranch}:");
+    }
+
+    public void Visit(ElseIfStatementNode node)
+    {
+        var elseBranch = _branchStack.Pop();
+        var exitBranch = _branchStack.Pop();
+
+        // _code.AppendLine($"br.s {newBranch}");
+        // _code.AppendLine($"{elseBranch}:");
+
+        node.Condition.Accept(this);
+        _code.AppendLine($"brfalse.s {elseBranch}");
+
+        foreach (var statement in node.Block)
+            statement.Accept(this);
+
+        _code.AppendLine($"br.s {exitBranch}");
+        _code.AppendLine($"{elseBranch}:");
+    }
+
+    public void Visit(ElseStatementNode node)
+    {
+        foreach (var statement in node.Statements)
+            statement.Accept(this);
     }
 
     public void Visit(InputStatementNode node)
