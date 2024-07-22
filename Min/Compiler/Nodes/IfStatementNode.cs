@@ -5,14 +5,14 @@ public class IfStatementNode : StatementNode
     public ExpressionNode Condition { get; init; }
     public List<StatementNode> Block { get; init; }
 
-    public List<ElseIfStatementNode>? ElseIfStatements { get; init; } = null;
+    public List<ElseIfStatementNode> ElseIfStatements { get; init; } = [];
     public ElseStatementNode? ElseStatement { get; init; } = null;
 
     public IfStatementNode(Position start, ExpressionNode condition, List<StatementNode> block, List<ElseIfStatementNode>? elseIfStatements = null, ElseStatementNode? elseStatement = null) : base(start)
     {
         Condition = condition;
         Block = block;
-        ElseIfStatements = elseIfStatements;
+        ElseIfStatements = elseIfStatements ?? [];
         ElseStatement = elseStatement;
     }
 

@@ -56,7 +56,7 @@ public class RawCilGenerator(SymbolTable symbols, ProgramNode root) : BaseCodeGe
         return _code.ToString();        
     }
 
-    private string GenerateBranchCode() => "b" + Guid.NewGuid();
+    private string GenerateBranchLabel() => "b" + Guid.NewGuid().ToString().Replace("-", "");
 
     public void Visit(ProgramNode node)
     {
@@ -83,39 +83,53 @@ public class RawCilGenerator(SymbolTable symbols, ProgramNode root) : BaseCodeGe
     {
         node.Condition.Accept(this);
 
-        var newBranch = GenerateBranchCode();
-        var exitBranch = GenerateBranchCode();
+        var ifStatementLabel = GenerateBranchLabel();
+        var endLabel = GenerateBranchLabel();
 
-        _branchStack.Push(newBranch);
+        List<string> labels = [];
+        foreach (var _ in node.ElseIfStatements)
+            labels.Add(GenerateBranchLabel());
 
-        _code.AppendLine($"brfalse.s {newBranch}");
+        if (node.ElseStatement is not null)
+            labels.Add(GenerateBranchLabel());
 
-        foreach (var statement in node.Block)
-            statement.Accept(this);
+        labels = [
+            ifStatementLabel,
+            ..labels,
+            endLabel
+        ];
 
-        _code.AppendLine($"br.s {exitBranch}");
+        node.Condition.Accept(this);
+        _code.AppendLine($"brfalse {labels[1]}");
 
-        if (node.ElseIfStatements is not null)
+        foreach (var stmt in node.Block)
+            stmt.Accept(this);
+
+        _code.AppendLine($"br {labels[^1]}");
+
+        for (int i = 0; i < node.ElseIfStatements.Count; i++)
         {
-            foreach (var elseIfBlock in node.ElseIfStatements)
-            {
-                _code.AppendLine($"{newBranch}:");
+            var elseIfStmt = node.ElseIfStatements[i];
+            _code.AppendLine($"{labels[i + 1]}:");
 
-                newBranch = GenerateBranchCode();
-                _branchStack.Push(exitBranch);
-                _branchStack.Push(newBranch); 
-                
-                elseIfBlock.Accept(this);
-            }
+            elseIfStmt.Condition.Accept(this);
+            _code.AppendLine($"brfalse {labels[i + 2]}");
+
+            foreach (var stmt in elseIfStmt.Block)
+                stmt.Accept(this);
+
+            _code.AppendLine($"br {labels[^1]}");
         }
 
         if (node.ElseStatement is not null)
         {
-            _branchStack.Push(exitBranch);
-            node.ElseStatement.Accept(this);
+            _code.AppendLine($"{labels[^2]}:");
+
+            foreach (var stmt in node.ElseStatement.Statements)
+                stmt.Accept(this);
         }
 
-        _code.AppendLine($"{exitBranch}:");
+        _code.AppendLine($"{labels[^1]}:");
     }
 
     public void Visit(ElseIfStatementNode node)
