@@ -345,6 +345,59 @@ public class IfStatementTests
     }
 
     [Fact]
+    public void Parse_NestedIfStatements_ReturnsTree()
+    {
+        var tokens = new List<Token>()
+        {
+            new Token(1, 0, TokenType.If),
+            new Token(1, 0, TokenType.NumberLiteral, "2"),
+            new Token(1, 0, TokenType.EqualsTo),
+            new Token(1, 0, TokenType.NumberLiteral, "3"),
+            new Token(1, 0, TokenType.Colon),
+            new Token(3, 0, TokenType.If),
+            new Token(3, 0, TokenType.True, "true"),
+            new Token(3, 0, TokenType.Colon),
+            new Token(4, 0, TokenType.Output),
+            new Token(4, 0, TokenType.StringLiteral, "min"),
+            new Token(8, 0, TokenType.EndIf),
+            new Token(9, 0, TokenType.EndIf),
+            new Token(9, 0, TokenType.EOF)
+        };
+        
+        var parser = new Parser(tokens);
+        Assert.Equivalent(new ProgramNode([
+            new IfStatementNode(
+                Position.From(tokens[0]),
+                new ComparisonExpressionNode(
+                    Position.From(tokens[1]),
+                    new NumberExpressionNode(Position.From(tokens[1]), 2),
+                    BuiltInOperator.EqualsTo,
+                    new NumberExpressionNode(Position.From(tokens[3]), 3)
+                ),
+                [
+                    new IfStatementNode(
+                        Position.From(tokens[5]),
+                        new BooleanExpressionNode(Position.From(tokens[6]), true),
+                        [
+                            new OutputStatementNode(
+                                Position.From(tokens[8]),
+                                [
+                                    new StringExpressionNode(
+                                        Position.From(tokens[9]),
+                                        "min"
+                                    )
+                                ]
+                            )
+                        ]
+                    )
+                    
+                ],
+                null
+            )
+        ]), parser.Program());
+    }
+
+    [Fact]
     public void Parse_UnfinishedSingleBranchIfStatement_ThrowsException()
     {
         
@@ -360,6 +413,31 @@ public class IfStatementTests
             new Token(2, 0, TokenType.StringLiteral, "min"),
             new Token(3, 0, TokenType.EOF)
         };
+
+        var parser = new Parser(tokens);
+        
+        var exception = Assert.Throws<CompilerException>(parser.Program);
+        Assert.Equal(CompilerExceptionType.UnexpectedEOF, exception.Type);
+    }
+
+    [Fact]
+    public void Parse_UnfinishedNestedIfStatement_ThrowsException()
+    {
+        var tokens = new List<Token>()
+        {
+             new Token(1, 0, TokenType.If),
+            new Token(1, 0, TokenType.NumberLiteral, "2"),
+            new Token(1, 0, TokenType.EqualsTo),
+            new Token(1, 0, TokenType.NumberLiteral, "3"),
+            new Token(1, 0, TokenType.Colon),
+            new Token(3, 0, TokenType.If),
+            new Token(3, 0, TokenType.True, "true"),
+            new Token(3, 0, TokenType.Colon),
+            new Token(4, 0, TokenType.Output),
+            new Token(4, 0, TokenType.StringLiteral, "min"),
+            new Token(8, 0, TokenType.EndIf),
+            new Token(9, 0, TokenType.EOF)
+       };
 
         var parser = new Parser(tokens);
         
